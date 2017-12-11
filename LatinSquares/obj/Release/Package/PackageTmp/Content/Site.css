@@ -1,0 +1,46 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+.navbar, h1, h2, h3, h4, h5, h6, p, label, input {
+    font-family: 'Roboto', sans-serif !important;
+}
+
+.navbar {
+    background-color: #323232 !important;
+    border: 0px solid #f0f0f0;
+    padding-top: 10px;
+    padding-bottom: 5px;
+}
+
+.navbar a {
+    font-size: 20px;
+    color: #f0f0f0;
+}
+
+.body-content {
+    margin-top: 30px;
+}
+
+pre, code {
+    display: table-cell;
+    text-align:center;
+    vertical-align:middle;
+    min-height: 250px;
+    min-width: 250px;
+}
+

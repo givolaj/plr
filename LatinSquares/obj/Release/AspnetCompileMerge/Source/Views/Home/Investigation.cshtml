@@ -1,0 +1,162 @@
+﻿<style>
+    .margin-bottom-10 {
+        margin-bottom: 10px;
+    }
+
+    input.error {
+        border: 1px solid red;
+    }
+
+    .form-group > label {
+        font-size: 14px !important;
+    }
+
+    #error {
+        color: #bb5588;
+        margin-top: 10px;
+    }
+
+    #initialSquareDiv {
+        width: 100% !important;
+        min-height: 250px;
+        margin-bottom: 10px;
+    }
+    .margin-left-10{
+        margin-left: 10px;
+    }
+    #squareInput {
+        margin-bottom: 10px;
+    }
+    #tripletsDiv {
+        width: 100% !important;
+        min-height: 250px;
+        overflow: auto;
+        margin-bottom: 10px;
+    }
+
+</style>
+<div class="jumbotron">
+    <h1>PLR Investigation</h1>
+    <p>investigate a PLR, see if it's guilty.</p>
+</div>
+<div class="row">
+
+    <div class="col-md-3">
+        <h2>The rectangle</h2>
+        <label>Click 'PLR' to generate a rectangle, 'Edit' to edit it, and 'Go' to start the investigation.</label>
+        <hr />
+        <div id="initialSquareDiv"><pre>your PLR will appear here</pre></div>
+        <div><textarea rows="5" class="form-control hidden" id="squareInput"></textarea></div>
+        <button class="btn btn-primary btn-lg pull-left" id="randomSquareBtn">PLR</button>    
+        <button class="btn btn-success btn-lg pull-left margin-left-10" id="editBtn">Edit</button> 
+        <button class="btn btn-info btn-lg pull-left margin-left-10" id="goBtn">Go</button> 
+    </div>
+
+    <div class="col-md-6 hidden" id="tripletsRow">
+        <h2>The Triplets</h2>
+        <label>we're counting non empty cells in rows, columns, and no. of symbols in the whole PLR, into these triplets, which allow us to extract an ER with which we can further investigate. </label>
+        <hr />
+        <div id="tripletsDiv"></div>
+        <button class="btn btn-primary btn-lg pull-left" id="tripletsIncreaseFontSize"><i class="glyphicon glyphicon-plus"></i></button>
+        <button class="btn btn-default btn-lg pull-right" id="tripletsDecreaseFontSize"><i class="glyphicon glyphicon-minus"></i></button>
+    </div>
+
+    <div class="col-md-3 hidden" id="ERRow">
+        <h2>The ER</h2>
+        <label>Equivalence relation extracted by Danny's Atp program.<br /> </label>
+        <hr />
+        <div id="ERDiv"></div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            function randomNumber(min, max) {
+                return Math.floor(Math.random() * (max - min)) + min;
+            }
+
+            $("#randomSquareBtn").click(function () {
+                let rows = randomNumber(4, 9);
+                let cols = randomNumber(4, 9);
+                let symbols = cols > rows ? cols : rows;
+                let count = rows * cols - randomNumber(0, (rows * cols / 2));
+
+                $.ajax({
+                    url: "/api/GetFullRectangle?rows=" + rows + "&cols=" + cols + "&symbols=" + symbols + "&count=" + count,
+                    type: "get",
+                    success: function (data) {
+                        $("#initialSquareDiv").html(data);
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+            });
+
+            $("#squareInput").on("input", function (e) {
+                let val = $("#squareInput").val();
+                val = val.replaceAll("] [", "]\n[");
+                $("#initialSquareDiv").html("<pre><code>" + val + "</code></pre>");
+            });
+
+            $("#editBtn").click(function () {
+                $("#squareInput").toggleClass("hidden");
+            });
+
+            $("#goBtn").click(function () {
+                $("#tripletsRow").removeClass("hidden");
+                $("#ERRow").removeClass("hidden");
+                let squareString = $("#initialSquareDiv").text();
+                console.log(squareString);
+                $.ajax({
+                    url: "/api/GetInvestigationObjectForRectangle?&squareString=" + squareString,
+                    type: "get",
+                    success: function (data) {
+                        let obj = JSON.parse(data);
+                        $("#tripletsDiv").html("<div>" + obj.triplets + "</div><div style='margin-top:10px;'>" + obj.indexedTriplets + "</div>");
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+                
+                $.ajax({
+                    url: "/api/GetAtp?&squareString=" + squareString,
+                    type: "get",
+                    success: function (data) {
+                        console.log(data);
+                        $("#ERDiv").html("<pre><code>" + data.replaceAll(";", "<br/>") + "</code></pre>");
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+
+            });
+
+
+            $("#tripletsIncreaseFontSize").click(function () {
+                var fontSize = parseInt($("#tripletsDiv").find("code").css("font-size"));
+                fontSize = fontSize + 1 + "px";
+                $("#tripletsDiv").find("code").css({'font-size':fontSize});
+            });
+
+            $("#tripletsDecreaseFontSize").click(function () {
+                var fontSize = parseInt($("#tripletsDiv").find("code").css("font-size"));
+                fontSize = fontSize - 1 + "px";
+                $("#tripletsDiv").find("code").css({ 'font-size': fontSize });
+            });
+
+            $("#initialSquareDiv").click(function () {
+                
+            });
+
+        });
+    </script>
+}
+
+
+
+
+

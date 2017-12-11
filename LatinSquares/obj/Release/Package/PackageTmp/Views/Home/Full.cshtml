@@ -1,0 +1,200 @@
+﻿<style>
+    .margin-bottom-10 {
+        margin-bottom: 10px;
+    }
+
+    input.error {
+        border: 1px solid red;
+    }
+
+    .form-group > label {
+        font-size: 14px !important;
+    }
+    #error {
+        color: #bb5588;
+        margin-top: 10px;
+    }
+</style>
+<div class="jumbotron">
+    <h1>Full PLRs</h1>
+    <p>We take full latin rectangles generated randomly with the Jacobson-Matthews algorithm, and remove values at random location, to generate the matrices on this page</p>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <h2>Parameters</h2>
+        <label>Fill out parametes and click 'Generate'.</label>
+        <hr />
+
+        <div class="form-group">
+            <label for="rows">Rows</label>
+            <input class="form-control margin-bottom-10" type="number" id="rows" placeholder="rows" />
+
+            <label for="cols">Columns</label>
+            <input class="form-control margin-bottom-10" type="number" id="cols" placeholder="columns" />
+
+            <label for="symbols"> Number of Symbols in language</label>
+            <input class="form-control margin-bottom-10" type="number" id="symbols" placeholder="Number of Symbols in language" />
+
+            <label for="count"> Number of symbols in matrix </label>
+            <input class="form-control margin-bottom-10" type="number" id="count" placeholder="Number of symbols in matrix" />
+
+            <br />
+            <button class="btn btn-success" id="generate">Generate</button>
+            <p id="error"></p>
+        </div>
+
+    </div>
+    <div class="col-md-4">
+        <h2>Results</h2>
+        <label>Results will show here. </label>
+        <hr />
+        <div id="output"></div>
+    </div>
+    <div class="col-md-4">
+        <h2>Other options</h2>
+        <label>More options for data. </label>
+        <hr />
+        <button class="btn btn-primary" id="download">Download a file with PLRs</button>
+    </div>
+</div>
+
+<div id="downloadInputModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Options</h4>
+            </div>
+            <div class="modal-body">
+                <label for="numberOfSquares">How many PLRs you want generated?</label>
+                <input class="form-control margin-bottom-10" type="number" id="numberOfSquares" placeholder="Number of PLRs" />
+                <p style="color:#4477bb;font-weight:bold;" id="workingLabel" class="hidden">working on it...</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="downloadSquares">Download</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="closeModal">Cancel</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $("#generate").click(function () {
+                let rows = $("#rows").val();
+                let cols = $("#cols").val();
+                let symbols = $("#symbols").val();
+                let count = $("#count").val();
+
+                if (rows == "") $("#rows").addClass("error");
+                else $("#rows").removeClass("error");
+
+                if (cols == "") $("#cols").addClass("error");
+                else $("#cols").removeClass("error");
+
+                if (symbols == "") $("#symbols").addClass("error");
+                else $("#symbols").removeClass("error");
+
+                if (count == "") count = Number(rows) * Number(cols);
+
+                if (rows == "" ||
+                    cols == "" ||
+                    symbols == "" ||
+                    Number(rows) > Number(symbols) ||
+                    Number(cols) > Number(symbols)) {
+                    $("#rows").addClass("error");
+                    $("#symbols").addClass("error");
+                    $("#error").html("can't have more rows and columns than symbols");
+                    return;
+                }
+
+                if (Number(count) > Number(rows) * Number(cols)) {
+                    $("#count").addClass("error");
+                    $("#error").html("come on buddy..");
+                    return;
+                }
+
+                $("#count").removeClass("error");
+
+                $("#error").html();
+                $.ajax({
+                    url: "/api/GetFullRectangle?rows=" + rows + "&cols=" + cols + "&symbols=" + symbols + "&count=" + count,
+                    type: "get",
+                    success: function (data) {
+                        $("#output").html(data);
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+            });
+
+            $("#download").click(function () {
+                let rows = $("#rows").val();
+                let cols = $("#cols").val();
+                let symbols = $("#symbols").val();
+
+                if (rows == "") $("#rows").addClass("error");
+                else $("#rows").removeClass("error");
+
+                if (cols == "") $("#cols").addClass("error");
+                else $("#cols").removeClass("error");
+
+                if (symbols == "") $("#symbols").addClass("error");
+                else $("#symbols").removeClass("error");
+  
+                if (rows == "" || cols == "" || symbols == "") return;
+
+                $("#downloadInputModal").modal('show');
+            });
+
+            $("#downloadSquares").click(function () {
+                let squares = $("#numberOfSquares").val();
+                if (squares == "") {
+                    $("#numberOfSquares").addClass("error");
+                    return;
+                }
+                else {
+                    $("#numberOfSquares").removeClass("error");
+                    $("#workingLabel").html('working on it...');
+                    $("#workingLabel").removeClass('hidden');
+                }
+                let rows = $("#rows").val();
+                let cols = $("#cols").val();
+                let symbols = $("#symbols").val();
+                let count = $("#count").val();
+                if (count == "") count = Number(rows) * Number(cols);
+
+                $.ajax({
+                    url: "/api/GetFullRectanglesFile?rows=" + rows + "&cols=" + cols + "&symbols=" + symbols + "&count=" + count + "&squares=" + squares,
+                    type: "get",
+                    success: function (data) {
+                        $("#workingLabel").html('done!');
+                        //$("#closeModal").click();
+                        console.log(data);
+                        download(data, "rectangles", "txt");
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+
+            });
+
+            $(document).on('click', '.matrix-cell', function () {
+                $(".matrix-cell").css("font-weight", "");
+                $(".matrix-cell").css("color", "");
+                let classes = $(this).attr('class').split(/\s+/);
+                $.each(classes, function (index, item) {
+                    if (item == "matrix-cell") return;
+                    $("." + item).css("font-weight", "bold");
+                    $("." + item).css("color", "#3355aa");
+                });
+            });
+        });
+    </script>
+}
+
