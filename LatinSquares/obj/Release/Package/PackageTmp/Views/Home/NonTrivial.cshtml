@@ -39,7 +39,7 @@
         <label>Click 'random square' to generate a square.</label>
         <hr />
         <div id="initialSquareDiv"><pre>your square will appear here</pre></div>
-        <button class="btn btn-primary btn-lg pull-left" id="randomSquareBtn">Random square</button>
+        <button class="btn btn-primary btn-lg pull-left" id="randomSquareBtn">Random PLR</button>
     </div>
 
     <div class="col-md-6">
@@ -62,8 +62,6 @@
                     url: "/api/GetNonTrivialRectangles?howMany=1",
                     type: "get",
                     success: function (data) {
-                        let formattedData = data.replaceAll("\n", "<br />");
-                        console.log(data);
                         $("#initialSquareDiv").html("<pre><code>" + data + "</code></pre>");
                     },
                     error: function (err) {

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Security;
 using System.Web;
+using static LatinSquares.Models.DbModels;
 
 namespace LatinSquares
 {
@@ -24,6 +25,67 @@ namespace LatinSquares
         public static Rectangle GetEmptyRectangle(int rows, int cols)
         {
             return new Rectangle(rows, cols);
+        }
+
+        internal static void SaveRectanlgeToDb(Rectangle sq, int rows, int cols, int symbols, int count, string type)
+        {
+            try
+            {
+                using (ApplicationDbContext db = new ApplicationDbContext())
+                {
+                    DbRectangle r = new DbRectangle()
+                    {
+                        Rows = rows,
+                        Cols = cols,
+                        Symbols = symbols,
+                        Count = count,
+                        Type = type,
+                        Content = sq.GetPlainTextString()
+                    };
+                    db.SaveRectangleIfNotInDb(r);
+                }
+            }
+            catch (Exception) { }
+        }
+
+        internal static void SaveRectanlgeToDb(string content, string type)
+        {
+            try
+            {
+                using (ApplicationDbContext db = new ApplicationDbContext())
+                {
+                    var contentRows = content.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries); ;
+                    int rows = contentRows.Count();
+                    int cols = contentRows[0].Split(' ').Count();
+                    int[] symbolsArr = new int[SYMBOLS.Count()];
+                    int count = rows * cols;
+
+                    foreach (var contentRow in contentRows)
+                    {
+                        for (int i = 0; i < contentRow.Length; i++)
+                        {
+                            if (contentRow[i].ToString() == Rectangle.EMPTY) count--;
+                            if (Char.IsLetterOrDigit(contentRow[i]))
+                            {
+                                symbolsArr[Array.FindIndex(SYMBOLS, x => x == contentRow[i].ToString())]++;
+                            }
+                        }
+                    }
+                    int symbols = symbolsArr.Where(x => x > 0).Count();
+
+                    DbRectangle r = new DbRectangle()
+                    {
+                        Rows = rows,
+                        Cols = cols,
+                        Symbols = symbols,
+                        Count = count,
+                        Type = type,
+                        Content = content
+                    };
+                    db.SaveRectangleIfNotInDb(r);
+                }
+            }
+            catch (Exception) { }
         }
 
         public static Rectangle GetRandomUnitRectangle(int rows, int cols, int symbols)
@@ -178,6 +240,26 @@ namespace LatinSquares
                     stream.Close();
             }
             return false;
+        }
+
+        internal static string GetRectangleFromDB(int rows, int cols, int symbols, int count, string type)
+        {
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                var rects = db.Rectangles
+                    .Where(x => x.Type == type)
+                    .Where(x => x.Rows == rows)
+                    .Where(x => x.Cols == cols)
+                    .Where(x => x.Symbols == symbols)
+                    .Where(x => x.Count == count);
+
+                if (rects == null || rects.Count() == 0) return "no such PLR in out db.. :(";
+                else
+                {
+                    int index = new Random().Next(rects.Count());
+                    return rects.ToList()[index].Content;
+                }
+            }
         }
     }
 }

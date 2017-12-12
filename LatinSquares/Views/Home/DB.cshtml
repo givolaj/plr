@@ -1,0 +1,122 @@
+﻿<style>
+    .margin-bottom-10 {
+        margin-bottom: 10px;
+    }
+
+    input.error {
+        border: 1px solid red;
+    }
+
+    .form-group > label {
+        font-size: 14px !important;
+    }
+
+    #error {
+        color: #bb5588;
+        margin-top: 10px;
+    }
+</style>
+<div class="jumbotron">
+    <h1>PLRs Database</h1>
+    <p>We save all of our generated PLRs in a databse so hopefully one day we'll have enough to make a cake!</p>
+    <p id="dbStats">
+        We currently have @ViewBag.empty empties, @ViewBag.full fulls and @ViewBag.non_trivial non-trivial rectangles in our db.
+    </p>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>Get a PLR from our db</h2>
+        <label>Fill out parametes and click 'Get From Db'.</label>
+        <hr />
+
+        <div class="form-group">
+            <label for="rows">Rows</label>
+            <input class="form-control margin-bottom-10" type="number" id="rows" placeholder="rows" />
+
+            <label for="cols">Columns</label>
+            <input class="form-control margin-bottom-10" type="number" id="cols" placeholder="columns" />
+
+            <label for="symbols"> Number of Symbols in language</label>
+            <input class="form-control margin-bottom-10" type="number" id="symbols" placeholder="Number of Symbols in language" />
+
+            <label for="count"> Number of symbols in matrix </label>
+            <input class="form-control margin-bottom-10" type="number" id="count" placeholder="Number of symbols in matrix" />
+            
+            <label for="type"> type of PLR, the method of creating it </label>
+            <select class="form-control margin-bottom-10" id="type">
+                <option>empty</option>
+                <option>full</option>
+                <option>non-trivial</option>
+            </select>
+
+            <br />
+            <button class="btn btn-success" id="generate">Get From Db</button>
+            <p id="error"></p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <h2>Results</h2>
+        <label>Results will show here. </label>
+        <hr />
+        <div id="output"></div>
+    </div>
+
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $("#generate").click(function () {
+                let rows = $("#rows").val();
+                let cols = $("#cols").val();
+                let symbols = $("#symbols").val();
+                let count = $("#count").val();
+                let type = $("#type").val();
+
+                if (rows == "") $("#rows").addClass("error");
+                else $("#rows").removeClass("error");
+
+                if (cols == "") $("#cols").addClass("error");
+                else $("#cols").removeClass("error");
+
+                if (symbols == "") $("#symbols").addClass("error");
+                else $("#symbols").removeClass("error");
+
+                if (count == "") count = Number(rows) * Number(cols);
+
+                if (rows == "" ||
+                    cols == "" ||
+                    symbols == "" ||
+                    Number(rows) > Number(symbols) ||
+                    Number(cols) > Number(symbols)) {
+                    $("#rows").addClass("error");
+                    $("#symbols").addClass("error");
+                    $("#error").html("can't have more rows and columns than symbols");
+                    return;
+                }
+
+                if (Number(count) > Number(rows) * Number(cols)) {
+                    $("#count").addClass("error");
+                    $("#error").html("come on buddy..");
+                    return;
+                }
+
+                $("#count").removeClass("error");
+                $("#error").html();
+
+                $.ajax({
+                    url: "/api/GetRectangleFromDb?rows=" + rows + "&cols=" + cols + "&symbols=" + symbols + "&count=" + count + "&type=" + type,
+                    type: "get",
+                    success: function (data) {   
+                        $("#output").html("<pre><code>" + data + "</code></pre>");
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+            });
+        });
+    </script>
+}
+

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using static LatinSquares.Models.DbModels;
 
 namespace LatinSquares.Controllers
 {
@@ -35,6 +36,18 @@ namespace LatinSquares.Controllers
         public ActionResult NonTrivial()
         {
             ViewBag.Title = "Non Trivial Rectangles";
+            return View();
+        }
+
+        public ActionResult DB()
+        {
+            ViewBag.Title = "Our Database";
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                ViewBag.empty = db.Rectangles.Count(x => x.Type == DbRectangle.TYPE_EMPTY);
+                ViewBag.full = db.Rectangles.Count(x => x.Type == DbRectangle.TYPE_FULL);
+                ViewBag.non_trivial = db.Rectangles.Count(x => x.Type == DbRectangle.TYPE_NON_TRIVIAL);
+            }
             return View();
         }
     }

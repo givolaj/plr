@@ -21,8 +21,8 @@ namespace LatinSquares.Controllers
 
             Rectangle sq = null;
             sq = Utils.GetRectangle(rows, cols, symbols, count);
+            Utils.SaveRectanlgeToDb(sq, rows, cols, symbols, count, DbModels.DbRectangle.TYPE_EMPTY);
             response.Content = new StringContent(sq.ToString());
-
             response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
             return response;
         }
@@ -36,6 +36,7 @@ namespace LatinSquares.Controllers
             while (squares-- > 0)
             {
                 Rectangle sq = Utils.GetRectangle(rows, cols, symbols, count);
+                Utils.SaveRectanlgeToDb(sq, rows, cols, symbols, count, DbModels.DbRectangle.TYPE_EMPTY);
                 if (squaresList.Contains(sq)) squares++;
                 else squaresList.Add(sq);
             }
@@ -58,11 +59,13 @@ namespace LatinSquares.Controllers
 
             Rectangle sq = null;
             sq = Utils.GetFullRectangle(rows, cols, symbols, count);
+            Utils.SaveRectanlgeToDb(sq, rows, cols, symbols, count, DbModels.DbRectangle.TYPE_FULL);
             response.Content = new StringContent(sq.ToString());
 
             response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
             return response;
         }
+
 
         [HttpGet]
         [Route("api/GetFullRectanglesFile")]
@@ -73,6 +76,7 @@ namespace LatinSquares.Controllers
             while (squares-- > 0)
             {
                 Rectangle sq = Utils.GetFullRectangle(rows, cols, symbols, count);
+                Utils.SaveRectanlgeToDb(sq, rows, cols, symbols, count, DbModels.DbRectangle.TYPE_FULL);
                 if (squaresList.Contains(sq)) squares++;
                 else squaresList.Add(sq);
             }
@@ -122,6 +126,11 @@ namespace LatinSquares.Controllers
                 FileInfo file = new FileInfo(fileName);
                 while (Utils.IsFileLocked(file));
                 res = File.ReadAllText(fileName);
+                var rectStrings = res.Split(new string[] { "\n\n"}, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var rect in rectStrings)
+                {
+                    Utils.SaveRectanlgeToDb(rect, DbModels.DbRectangle.TYPE_NON_TRIVIAL);
+                }
             }
             catch (Exception e)
             {
@@ -185,6 +194,20 @@ namespace LatinSquares.Controllers
             }
 
             response.Content = new StringContent(res);
+            response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
+            return response;
+        }
+
+
+        [HttpGet]
+        [Route("api/GetRectangleFromDb")]
+        public HttpResponseMessage GetRectangleFromDb([FromUri] int rows = 5, [FromUri] int cols = 5, [FromUri] int count = 25, [FromUri] int symbols = 5, [FromUri] string type = "empty")
+        {
+            var response = new HttpResponseMessage();
+            response.Content = new StringContent("the rectangle didnt make it this time:(");
+
+            response.Content = new StringContent(Utils.GetRectangleFromDB(rows, cols, symbols, count, type));
+
             response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
             return response;
         }

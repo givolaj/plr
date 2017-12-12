@@ -62,8 +62,6 @@
                     url: "/api/GetNonTrivialRectangles?howMany=1",
                     type: "get",
                     success: function (data) {
-                        let formattedData = data.replaceAll("\n", "<br />");
-                        console.log(data);
                         $("#initialSquareDiv").html("<pre><code>" + data + "</code></pre>");
                     },
                     error: function (err) {
