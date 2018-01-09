@@ -35,10 +35,11 @@ namespace LatinSquares.Models
             }
             partitions = new Dictionary<string, string>();
             partitions.Add("rows", GetPartitionsForRows(tripletValues));
-            partitions.Add("cols", GetPartitionsForRows(GetTripletsForCols(tripletValues)));
+            partitions.Add("cols", GetPartitionsForRows(GetTripletsInOrder(tripletValues, 1,0,2)));
+            partitions.Add("symbols", GetPartitionsForRows(GetTripletsInOrder(tripletValues, 2, 1, 0)));
         }
 
-        private string[,] GetTripletsForCols(string[,] tripletValues)
+        private string[,] GetTripletsInOrder(string[,] tripletValues, int a, int b, int c)
         {
             string[,] colsTripletValues = new string[tripletValues.GetLength(1), tripletValues.GetLength(0)];
             for (int i = 0; i < tripletValues.GetLength(0); i++)
@@ -49,7 +50,7 @@ namespace LatinSquares.Models
                     if (!triplet.Contains("-"))
                     {
                         var parts = triplet.Replace("(", "").Replace(")", "").Split(',');
-                        triplet = "(" + parts[1] + "," + parts[0] + "," + parts[2] + ")";
+                        triplet = "(" + parts[a] + "," + parts[b] + "," + parts[c] + ")";
                     }
                     colsTripletValues[j, i] = triplet;
                 }

@@ -61,7 +61,7 @@
     </div>
 
     <div class="col-md-4 hidden" id="ERRow">
-        <h2>Base Partitions</h2>
+        <h2>Basic Partitions</h2>
         <label>We're calculating partitions from the strong entry invariant matrix by counting non-empty indices in row and column and number of symbols in matrix<br /> </label>
         <hr />
         <div id="ERDiv"></div>
@@ -107,7 +107,8 @@
                         let obj = JSON.parse(data);
                         $("#tripletsDiv").html("<div>" + obj.triplets + "</div><div style='margin-top:10px;'>" + obj.indexedTriplets + "</div>");
                         $("#ERDiv").html("<pre><code>" + "rows: " + obj.partitions["rows"] +
-                            "\ncolumns: " + obj.partitions["cols"] + "</code></pre>");
+                            "\ncolumns: " + obj.partitions["cols"] +
+                            "\nsymbols: " + obj.partitions["symbols"] + "</code></pre>");
                     },
                     error: function (err) {
                         console.log(err);
