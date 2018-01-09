@@ -102,9 +102,9 @@ namespace LatinSquares.Controllers
                 InvestigationObject obj = new InvestigationObject(squareString);
                 res = obj.AsString("all");
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                res = "square not valid";
+                res = "error: " + e.Message;
             }
 
             response.Content = new StringContent(res);

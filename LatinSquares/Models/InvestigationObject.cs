@@ -10,6 +10,7 @@ namespace LatinSquares.Models
     {
         private Rectangle square;
         private string[,] tripletValues;
+        private Dictionary<string, string> partitions;
 
         public InvestigationObject(string squareString)
         {
@@ -32,8 +33,66 @@ namespace LatinSquares.Models
                             square.GetNumberOfOccurencesOfSymbol(i, j) + ")";
                 }
             }
+            partitions = new Dictionary<string, string>();
+            partitions.Add("rows", GetPartitionsForRows(tripletValues));
+            partitions.Add("cols", GetPartitionsForRows(GetTripletsForCols(tripletValues)));
         }
 
+        private string[,] GetTripletsForCols(string[,] tripletValues)
+        {
+            string[,] colsTripletValues = new string[tripletValues.GetLength(1), tripletValues.GetLength(0)];
+            for (int i = 0; i < tripletValues.GetLength(0); i++)
+            {
+                for (int j = 0; j < tripletValues.GetLength(1); j++)
+                {
+                    string triplet = tripletValues[i, j];
+                    if (!triplet.Contains("-"))
+                    {
+                        var parts = triplet.Replace("(", "").Replace(")", "").Split(',');
+                        triplet = "(" + parts[1] + "," + parts[0] + "," + parts[2] + ")";
+                    }
+                    colsTripletValues[j, i] = triplet;
+                }
+            }
+            return colsTripletValues;
+        }
+
+        private string GetPartitionsForRows(string [,] tripletValues)
+        {
+            var rows = new List<string[]>();
+            for (int i = 0; i < tripletValues.GetLength(0); i++)
+            {
+                rows.Add(Utils.GetRow<string>(tripletValues, i).OrderBy(x => x).ToArray());
+            }
+            var rowsPartitions = new Dictionary<int, List<int>>();
+            for (int i = 0; i < rows.Count; i++)
+            {
+                rowsPartitions.Add(i, new List<int>());
+                var r = rows[i];
+                for (int j = 0; j < rows.Count; j++)
+                {
+                    if (r.SequenceEqual(rows[j]))
+                    {
+                        rowsPartitions[i].Add(j);
+                    }
+                }
+            }
+            List<int> done = new List<int>();
+            string rowsString = "[";
+            foreach (var p in rowsPartitions)
+            {
+                if (done.Contains(p.Key)) continue;
+                done.AddRange(p.Value);
+                rowsString += "{";
+                foreach (int n in p.Value)
+                {
+                    rowsString += (n + 1) + ",";
+                }
+                rowsString = rowsString.Substring(0, rowsString.Length - 1) + "},";
+            }
+            rowsString = rowsString.Substring(0, rowsString.Length - 1) + "]";
+            return rowsString;
+        }
 
         public string AsString(string type)
         {
@@ -59,7 +118,8 @@ namespace LatinSquares.Models
                 {
                     square = GenerateSquareString(),
                     triplets = GenerateTripletsString(),
-                    indexedTriplets = GenerateIndexedTripletsString()
+                    indexedTriplets = GenerateIndexedTripletsString(),
+                    partitions = partitions
             };
                 return JsonConvert.SerializeObject(obj);
             }

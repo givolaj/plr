@@ -88,6 +88,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -238,6 +239,7 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Properties\PublishProfiles\file system.pubxml" />
     <None Include="Properties\PublishProfiles\website.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
@@ -267,6 +269,7 @@
     <Content Include="Views\Home\Investigation.cshtml" />
     <Content Include="Views\Home\NonTrivial.cshtml" />
     <Content Include="Views\Home\DB.cshtml" />
+    <Content Include="Views\Home\VisualSimulation.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

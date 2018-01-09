@@ -50,5 +50,12 @@ namespace LatinSquares.Controllers
             }
             return View();
         }
+
+        public ActionResult VisualSimulation()
+        {
+            ViewBag.Title = "Visual Simulation";
+            return View();
+        }
+
     }
 }

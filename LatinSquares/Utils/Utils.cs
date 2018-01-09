@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Security;
 using System.Web;
 using static LatinSquares.Models.DbModels;
@@ -12,7 +13,7 @@ namespace LatinSquares
 {
     public static class Utils
     {
-        public readonly static string[] SYMBOLS = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n" ,"o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z" };
+        public readonly static string[] SYMBOLS = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n" ,"o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z" };
 
         private static Random random = null;
         public static Random GetGlobalRandomGenerator()
@@ -29,63 +30,68 @@ namespace LatinSquares
 
         internal static void SaveRectanlgeToDb(Rectangle sq, int rows, int cols, int symbols, int count, string type)
         {
-            try
-            {
-                using (ApplicationDbContext db = new ApplicationDbContext())
-                {
-                    DbRectangle r = new DbRectangle()
+            System.Threading.ThreadPool.QueueUserWorkItem(delegate {    
+                    try
                     {
-                        Rows = rows,
-                        Cols = cols,
-                        Symbols = symbols,
-                        Count = count,
-                        Type = type,
-                        Content = sq.GetPlainTextString()
-                    };
-                    db.SaveRectangleIfNotInDb(r);
-                }
-            }
-            catch (Exception) { }
+                        using (ApplicationDbContext db = new ApplicationDbContext())
+                        {
+                            DbRectangle r = new DbRectangle()
+                            {
+                                Rows = rows,
+                                Cols = cols,
+                                Symbols = symbols,
+                                Count = count,
+                                Type = type,
+                                Content = sq.GetPlainTextString()
+                            };
+                            db.SaveRectangleIfNotInDb(r);
+                        }
+                    }
+                    catch (Exception) { }
+            }, null);         
         }
 
         internal static void SaveRectanlgeToDb(string content, string type)
         {
-            try
+            System.Threading.ThreadPool.QueueUserWorkItem(delegate
             {
-                using (ApplicationDbContext db = new ApplicationDbContext())
+                try
                 {
-                    var contentRows = content.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries); ;
-                    int rows = contentRows.Count();
-                    int cols = contentRows[0].Split(' ').Count();
-                    int[] symbolsArr = new int[SYMBOLS.Count()];
-                    int count = rows * cols;
-
-                    foreach (var contentRow in contentRows)
+                    using (ApplicationDbContext db = new ApplicationDbContext())
                     {
-                        for (int i = 0; i < contentRow.Length; i++)
+                        var contentRows = content.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries); ;
+                        int rows = contentRows.Count();
+                        int cols = contentRows[0].Split(' ').Count();
+                        int[] symbolsArr = new int[SYMBOLS.Count()];
+                        int count = rows * cols;
+
+                        foreach (var contentRow in contentRows)
                         {
-                            if (contentRow[i].ToString() == Rectangle.EMPTY) count--;
-                            if (Char.IsLetterOrDigit(contentRow[i]))
+                            for (int i = 0; i < contentRow.Length; i++)
                             {
-                                symbolsArr[Array.FindIndex(SYMBOLS, x => x == contentRow[i].ToString())]++;
+                                if (contentRow[i].ToString() == Rectangle.EMPTY) count--;
+                                if (Char.IsLetterOrDigit(contentRow[i]))
+                                {
+                                    symbolsArr[Array.FindIndex(SYMBOLS, x => x == contentRow[i].ToString())]++;
+                                }
                             }
                         }
-                    }
-                    int symbols = symbolsArr.Where(x => x > 0).Count();
+                        int symbols = symbolsArr.Where(x => x > 0).Count();
 
-                    DbRectangle r = new DbRectangle()
-                    {
-                        Rows = rows,
-                        Cols = cols,
-                        Symbols = symbols,
-                        Count = count,
-                        Type = type,
-                        Content = content
-                    };
-                    db.SaveRectangleIfNotInDb(r);
+                        DbRectangle r = new DbRectangle()
+                        {
+                            Rows = rows,
+                            Cols = cols,
+                            Symbols = symbols,
+                            Count = count,
+                            Type = type,
+                            Content = content
+                        };
+                        db.SaveRectangleIfNotInDb(r);
+                    }
                 }
-            }
-            catch (Exception) { }
+                catch (Exception) { }
+            }, null);
         }
 
         public static Rectangle GetRandomUnitRectangle(int rows, int cols, int symbols)
@@ -218,7 +224,33 @@ namespace LatinSquares
                     output += proc.StandardOutput.ReadLine() + "\n";
                 }
                 proc.WaitForExit();
+                KillProcessAndChildrens(proc.Id);
                 return output;
+            }
+        }
+
+        private static void KillProcessAndChildrens(int pid)
+        {
+            ManagementObjectSearcher processSearcher = new ManagementObjectSearcher
+              ("Select * From Win32_Process Where ParentProcessID=" + pid);
+            ManagementObjectCollection processCollection = processSearcher.Get();
+
+            try
+            {
+                Process proc = Process.GetProcessById(pid);
+                if (!proc.HasExited) proc.Kill();
+            }
+            catch (ArgumentException)
+            {
+                // Process already exited.
+            }
+
+            if (processCollection != null)
+            {
+                foreach (ManagementObject mo in processCollection)
+                {
+                    KillProcessAndChildrens(Convert.ToInt32(mo["ProcessID"])); //kill child processes(also kills childrens of childrens etc.)
+                }
             }
         }
 
@@ -260,6 +292,46 @@ namespace LatinSquares
                     return rects.ToList()[index].Content;
                 }
             }
+        }
+
+        public static T[] GetRow<T>(T[,] matrix, int row)
+        {
+            var columns = matrix.GetLength(1);
+            var array = new T[columns];
+            for (int i = 0; i < columns; ++i)
+                array[i] = matrix[row, i];
+            return array;
+        }
+
+        public static T[,] TransposeRowsAndColumns<T>(this T[,] arr)
+        {
+            int rowCount = arr.GetLength(0);
+            int columnCount = arr.GetLength(1);
+            T[,] transposed = new T[columnCount, rowCount];
+            if (rowCount == columnCount)
+            {
+                transposed = (T[,])arr.Clone();
+                for (int i = 1; i < rowCount; i++)
+                {
+                    for (int j = 0; j < i; j++)
+                    {
+                        T temp = transposed[i, j];
+                        transposed[i, j] = transposed[j, i];
+                        transposed[j, i] = temp;
+                    }
+                }
+            }
+            else
+            {
+                for (int column = 0; column < columnCount; column++)
+                {
+                    for (int row = 0; row < rowCount; row++)
+                    {
+                        transposed[column, row] = arr[row, column];
+                    }
+                }
+            }
+            return transposed;
         }
     }
 }
