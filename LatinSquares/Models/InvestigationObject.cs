@@ -9,6 +9,7 @@ namespace LatinSquares.Models
     public class InvestigationObject
     {
         private Rectangle square;
+        private Cube cube;
         private string[,] tripletValues;
         private Dictionary<string, string> partitions;
 
@@ -19,7 +20,18 @@ namespace LatinSquares.Models
             {
                 throw new Exception("this square string doesn't represent a valid latin square");
             }
-            tripletValues = new string[square.GetRowsNumber(), square.GetColumnsNumber()];
+            cube = new Cube(square);
+            tripletValues = GetTriplietsFromSquare(square);
+            partitions = new Dictionary<string, string>();
+            partitions.Add("rows", GetPartitionsForRows(tripletValues));
+            partitions.Add("cols", GetPartitionsForRows(GetTripletsInOrder(tripletValues, 1,0,2)));
+            partitions.Add("symbols", GetPartitionsForRows(
+                GetTriplietsFromSquare(new Cube(square).GetCubeWithSymbolsAsRowsTranspose().toRectangle(square.SymbolCount(), square.GetColumnsNumber()))));
+        }
+
+        private string[,] GetTriplietsFromSquare(Rectangle square)
+        {
+            var tripletValues = new string[square.GetRowsNumber(), square.GetColumnsNumber()];
             for (int i = 0; i < tripletValues.GetLength(0); i++)
             {
                 for (int j = 0; j < tripletValues.GetLength(1); j++)
@@ -33,10 +45,7 @@ namespace LatinSquares.Models
                             square.GetNumberOfOccurencesOfSymbol(i, j) + ")";
                 }
             }
-            partitions = new Dictionary<string, string>();
-            partitions.Add("rows", GetPartitionsForRows(tripletValues));
-            partitions.Add("cols", GetPartitionsForRows(GetTripletsInOrder(tripletValues, 1,0,2)));
-            partitions.Add("symbols", GetPartitionsForRows(GetTripletsInOrder(tripletValues, 2, 1, 0)));
+            return tripletValues;
         }
 
         private string[,] GetTripletsInOrder(string[,] tripletValues, int a, int b, int c)

@@ -31,6 +31,16 @@ namespace LatinSquares.Models
             return false;
         }
 
+        internal int BiggestDimension()
+        {
+            int rows = GetRowsNumber();
+            int cols = GetColumnsNumber();
+            int symbols = SymbolCount();
+            if (symbols > rows && symbols > cols) return symbols;
+            else if (rows > symbols && rows > cols) return rows;
+            else return cols;
+        }
+
         public bool HasValueInCol(string value, int col)
         {
             for (int i = 0; i < GetRowsNumber(); i++)
@@ -238,7 +248,19 @@ namespace LatinSquares.Models
             return count;
         }
 
-
+        public int SymbolCount()
+        {
+            List<string> list = new List<string>();
+            for (int i = 0; i < values.GetLength(0); i++)
+            {
+                for (int j = 0; j < values.GetLength(1); j++)
+                {
+                    if(!list.Contains(values[i, j]) && values[i, j] != EMPTY)
+                        list.Add(values[i, j]);
+                }
+            }
+            return list.Count;
+        }
 
     }
 }

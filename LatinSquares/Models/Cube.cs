@@ -11,6 +11,7 @@ namespace LatinSquares.Models
     {
         private int[,,] values;
         public static int EMPTY = 0;
+        public static int NON_EMPTY = 1;
 
         public Cube(int rows)
         {
@@ -27,13 +28,52 @@ namespace LatinSquares.Models
             }
         }
 
+        public Cube(Rectangle square)
+        {
+            int size = square.BiggestDimension();
+            values = new int[size, size, size];
+            int rows = square.GetRowsNumber();
+            int cols = square.GetColumnsNumber();
+            int symbols = square.SymbolCount();
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    for (int k = 0; k < symbols; k++)
+                    {
+                        if(square.values[i,j] == Utils.SYMBOLS[k])
+                            values[i, j, k] = NON_EMPTY;
+                        else
+                            values[i, j, k] = EMPTY;
+                    }
+                }
+            }
+        }
+
+        public Cube GetCubeWithSymbolsAsRowsTranspose()
+        {
+            int size = values.GetLength(0);
+            Cube cube = new Cube(size);
+            for (int i = 0; i < size; i++)
+            {
+                for (int j = 0; j < size; j++)
+                {
+                    for (int k = 0; k < size; k++)
+                    {
+                        cube.values[i, j, k] = values[k, i, j];
+                    }
+                }
+            }
+            return cube;
+        }
+
         public void initAsUnitCube()
         {
             for (int i = 0; i < values.GetLength(0); i++)
             {
                 for (int j = 0; j < values.GetLength(1); j++)
                 {
-                    values[i, j, (i + j) % (values.GetLength(2))] = 1;
+                    values[i, j, (i + j) % (values.GetLength(2))] = NON_EMPTY;
                 }
             }
         }
@@ -59,6 +99,7 @@ namespace LatinSquares.Models
         bool isProper = true;
         int improper_x, improper_y, improper_z;
         Random rnd = new Random();
+
         public void runJacobsonMatthewsSteps(int minSteps)
         {          
             for (int t = 0; t < minSteps; t++)
