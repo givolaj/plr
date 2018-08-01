@@ -57,9 +57,6 @@ c:\users\admin\documents\visual studio 2015\Projects\LatinSquares\LatinSquares\b
 c:\users\admin\documents\visual studio 2015\Projects\LatinSquares\LatinSquares\obj\Debug\LatinSquares.csprojResolveAssemblyReference.cache
 c:\users\admin\documents\visual studio 2015\Projects\LatinSquares\LatinSquares\obj\Debug\LatinSquares.dll
 c:\users\admin\documents\visual studio 2015\Projects\LatinSquares\LatinSquares\obj\Debug\LatinSquares.pdb
-C:\Users\Admin\Desktop\latin\plr\LatinSquares\obj\Debug\LatinSquares.csprojResolveAssemblyReference.cache
-C:\Users\Admin\Desktop\latin\plr\LatinSquares\obj\Debug\LatinSquares.dll
-C:\Users\Admin\Desktop\latin\plr\LatinSquares\obj\Debug\LatinSquares.pdb
 C:\Users\Admin\Desktop\latin\plr\LatinSquares\bin\ApplicationInsights.config
 C:\Users\Admin\Desktop\latin\plr\LatinSquares\bin\roslyn\csc.exe
 C:\Users\Admin\Desktop\latin\plr\LatinSquares\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
@@ -120,3 +117,6 @@ C:\Users\Admin\Desktop\latin\plr\LatinSquares\bin\System.Web.WebPages.xml
 C:\Users\Admin\Desktop\latin\plr\LatinSquares\bin\System.Web.WebPages.Deployment.xml
 C:\Users\Admin\Desktop\latin\plr\LatinSquares\bin\System.Web.WebPages.Razor.xml
 C:\Users\Admin\Desktop\latin\plr\LatinSquares\bin\Antlr3.Runtime.pdb
+C:\Users\Admin\Desktop\latin\plr\LatinSquares\obj\Debug\LatinSquares.csprojResolveAssemblyReference.cache
+C:\Users\Admin\Desktop\latin\plr\LatinSquares\obj\Debug\LatinSquares.dll
+C:\Users\Admin\Desktop\latin\plr\LatinSquares\obj\Debug\LatinSquares.pdb

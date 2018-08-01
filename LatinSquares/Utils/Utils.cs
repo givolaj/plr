@@ -254,6 +254,26 @@ namespace LatinSquares
             }
         }
 
+        public static string Format(string input)
+        {
+            string newInput = "";
+            string[] lines = input.Split('\n');
+            foreach (var line in lines)
+            {
+                int rows = (int) Math.Sqrt(line.Length);
+                int cols = rows;
+                string newLine = line.Replace('0', Rectangle.EMPTY[0]);
+                string rectString = "";
+                for (int i = 0; i < rows; i++)
+                {
+                    string newRow = "[" + string.Join(" ", newLine.Substring(i*cols, cols).ToCharArray().Select(x => x + "").ToArray()) + "]\n";
+                    rectString += newRow;
+                }
+                newInput += rectString + "\n\n";
+            }
+            return newInput;
+        }
+
         public static bool IsFileLocked(FileInfo file)
         {
             FileStream stream = null;
@@ -274,7 +294,7 @@ namespace LatinSquares
             return false;
         }
 
-        internal static string GetRectangleFromDB(int rows, int cols, int symbols, int count, string type)
+        internal static string GetRectangleFromDB(int rows, int cols, int symbols, int count, string type, int number)
         {
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
@@ -283,14 +303,21 @@ namespace LatinSquares
                     .Where(x => x.Rows == rows)
                     .Where(x => x.Cols == cols)
                     .Where(x => x.Symbols == symbols)
-                    .Where(x => x.Count == count);
+                    .Where(x => x.Count == count).ToList();
 
                 if (rects == null || rects.Count() == 0) return "no such PLR in out db.. :(";
-                else
+
+                string result = "";
+                while (number-- > 0 && rects.Count() > 0)
                 {
                     int index = new Random().Next(rects.Count());
-                    return rects.ToList()[index].Content;
+                    result += rects.ToList()[index].Content + (number == 0 ? "" : "\n\n");
+                    rects.RemoveAt(index);
                 }
+
+
+                  
+                return result;
             }
         }
 

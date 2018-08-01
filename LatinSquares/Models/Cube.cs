@@ -50,6 +50,23 @@ namespace LatinSquares.Models
             }
         }
 
+        public Cube GetCubeWithColumnsAsRowsTranspose()
+        {
+            int size = values.GetLength(0);
+            Cube cube = new Cube(size);
+            for (int i = 0; i < size; i++)
+            {
+                for (int j = 0; j < size; j++)
+                {
+                    for (int k = 0; k < size; k++)
+                    {
+                        cube.values[i, j, k] = values[j, i, k];
+                    }
+                }
+            }
+            return cube;
+        }
+
         public Cube GetCubeWithSymbolsAsRowsTranspose()
         {
             int size = values.GetLength(0);
@@ -60,7 +77,7 @@ namespace LatinSquares.Models
                 {
                     for (int k = 0; k < size; k++)
                     {
-                        cube.values[i, j, k] = values[k, i, j];
+                        cube.values[i, j, k] = values[k, j, i];
                     }
                 }
             }

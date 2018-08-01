@@ -118,6 +118,7 @@ namespace LatinSquares.Controllers
         public HttpResponseMessage GetNonTrivialRectangles([FromUri] string howMany)
         {
             var response = new HttpResponseMessage();
+            string result = "";
             string res = "";
             try
             {
@@ -127,9 +128,21 @@ namespace LatinSquares.Controllers
                 while (Utils.IsFileLocked(file));
                 res = File.ReadAllText(fileName);
                 var rectStrings = res.Split(new string[] { "\n\n"}, StringSplitOptions.RemoveEmptyEntries);
+                List<char> chars = new List<char>();
                 foreach (var rect in rectStrings)
                 {
-                    Utils.SaveRectanlgeToDb(rect, DbModels.DbRectangle.TYPE_NON_TRIVIAL);
+                    string r = rect;
+                    foreach (var c in r.ToCharArray())
+                    {
+                        if (Char.IsLetterOrDigit(c) && !chars.Contains(c)) chars.Add(c);
+                    }
+                    for (int i = 0; i < r.Length; i++)
+                    {
+                        if (chars.Contains(r[i]))
+                            r = r.Substring(0, i) + Utils.SYMBOLS[chars.IndexOf(r[i])] + r.Substring(i+1);
+                    }
+                    Utils.SaveRectanlgeToDb(r, DbModels.DbRectangle.TYPE_NON_TRIVIAL);
+                    result += (r + "\n\n");
                 }
             }
             catch (Exception e)
@@ -138,7 +151,7 @@ namespace LatinSquares.Controllers
                 File.WriteAllText(@"c:\log.txt", res);
             }
 
-            response.Content = new StringContent(res);
+            response.Content = new StringContent(result);
             response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
             return response;
         }
@@ -201,15 +214,45 @@ namespace LatinSquares.Controllers
 
         [HttpGet]
         [Route("api/GetRectangleFromDb")]
-        public HttpResponseMessage GetRectangleFromDb([FromUri] int rows = 5, [FromUri] int cols = 5, [FromUri] int count = 25, [FromUri] int symbols = 5, [FromUri] string type = "empty")
+        public HttpResponseMessage GetRectangleFromDb([FromUri] int rows = 5, [FromUri] int cols = 5, [FromUri] int count = 25, [FromUri] int symbols = 5, [FromUri] string type = "empty", [FromUri] int number = 1)
         {
             var response = new HttpResponseMessage();
             response.Content = new StringContent("the rectangle didnt make it this time:(");
 
-            response.Content = new StringContent(Utils.GetRectangleFromDB(rows, cols, symbols, count, type));
+            response.Content = new StringContent(Utils.GetRectangleFromDB(rows, cols, symbols, count, type, number));
 
             response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
             return response;
         }
+
+
+        [HttpPost]
+        [Route("api/checkRectangles/{flag}")]
+        public HttpResponseMessage CheckRectangles(bool flag, [FromBody] string input)
+        {
+            var response = new HttpResponseMessage();
+            if (flag)
+            {
+                input = Utils.Format(input);
+            }
+            int count = 0, countG = 0;
+            string[] squares = input.Trim().Split(new string[] { "\n\n" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var s in squares)
+            {
+                InvestigationObject obj = new InvestigationObject(s.Replace("\n", ""));
+                if (obj.IsPartitionTrivial()) count++;
+                if (obj.IsPartitionTrivial(true)) countG++;
+            }
+            string res = "number of squares inserted: " + squares.Count();
+            res += "\nnumber of squares found trivial by first partition (D): " + count;
+            res += "\npercent: " + (((double)count)/squares.Count());
+            res += "\nnumber of squares found trivial by first partition (G): " + countG;
+            res += "\npercent: " + (((double)countG) / squares.Count());
+            res += "\nHope that helped!!";
+            response.Content = new StringContent(res);
+            response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
+            return response;
+        }
+       
     }
 }

@@ -7,7 +7,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
   <PropertyGroup>
     <TimeStampOfAssociatedLegacyPublishXmlFile />
     <_PublishTargetUrl>C:\Users\Admin\Desktop\latin</_PublishTargetUrl>
-    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA2To/nBfTJ0urAjaZiFa4SQAAAAACAAAAAAAQZgAAAAEAACAAAADvDZq55XVt5bjgmmOwx81uOFf0TfSDwUSibOs4391fnAAAAAAOgAAAAAIAACAAAAAw2wSZYCsit6sJF/bDtYKTokoKl8xF/MjBhCxZzeCwrSAAAABe3iQBcOphTcjbbogEh6WWkdHSS7yilEDHw6OjX+c5HUAAAAChr/nzm7UcHe595OXLzHF72nj5CvdbEGpy/gdGvVtBYhuz49t0T80MyUfOCwTG6/7wjn1i/BzVEpzofpnI2tal</EncryptedPassword>
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAhkCwLKiBQESbQbqPnlESiwAAAAACAAAAAAAQZgAAAAEAACAAAABeOWtvKSDrsEnpqvGZWZzosCfGlJ9UUI+XMyc6oh+5zgAAAAAOgAAAAAIAACAAAAAKMcj3PUUPRDKJAbO8HL7OyvQjyOc3WR5VrLGpRlRlzyAAAAD+9r7gd4Jjp0qZbbJIgqLAjUDxy/M7NSKpjvUNnM5X0UAAAABBmHhpfJsXqoGZQKu9Dm35qPuxVF3cvK/BKVcKUjhOTAG1ET3GEo05H91shyMSZIYJQyUQAVbqVkd85kvLUs1a</EncryptedPassword>
   </PropertyGroup>
   <ItemGroup>
     <File Include="ApplicationInsights.config">

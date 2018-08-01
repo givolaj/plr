@@ -2,7 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
+using System.Web.Script.Serialization;
+using System.Web.WebPages;
 
 namespace LatinSquares.Models
 {
@@ -11,7 +14,8 @@ namespace LatinSquares.Models
         private Rectangle square;
         private Cube cube;
         private string[,] tripletValues;
-        private Dictionary<string, string> partitions;
+        private Dictionary<string, string[,]> comparisonMatrices;
+        public Dictionary<string, List<string>> partitions;
 
         public InvestigationObject(string squareString)
         {
@@ -21,12 +25,43 @@ namespace LatinSquares.Models
                 throw new Exception("this square string doesn't represent a valid latin square");
             }
             cube = new Cube(square);
+
+            comparisonMatrices = new Dictionary<string, string[,]>();
+            comparisonMatrices.Add("rows", GetComparisonMatrix(square.values));
+            comparisonMatrices.Add("cols" ,GetComparisonMatrix(new Cube(square).
+                GetCubeWithColumnsAsRowsTranspose().toRectangle(square.GetColumnsNumber(),
+                square.GetRowsNumber()).values));
+            comparisonMatrices.Add("symbols", GetComparisonMatrix(new Cube(square).
+                GetCubeWithSymbolsAsRowsTranspose().toRectangle(square.GetColumnsNumber(),
+                square.GetRowsNumber()).values));
+
             tripletValues = GetTriplietsFromSquare(square);
-            partitions = new Dictionary<string, string>();
-            partitions.Add("rows", GetPartitionsForRows(tripletValues));
-            partitions.Add("cols", GetPartitionsForRows(GetTripletsInOrder(tripletValues, 1,0,2)));
-            partitions.Add("symbols", GetPartitionsForRows(
-                GetTriplietsFromSquare(new Cube(square).GetCubeWithSymbolsAsRowsTranspose().toRectangle(square.SymbolCount(), square.GetColumnsNumber()))));
+
+            partitions = new Dictionary<string, List<string>>();
+            partitions.Add("rows", new List<string>() { GetPartitionsForRows(tripletValues) });
+            partitions.Add("cols", new List<string>() {
+                //GetPartitionsForRows(GetTripletsInOrder(tripletValues, 1,0,2)) });
+                GetPartitionsForRows(
+                GetTriplietsFromSquare(new Cube(square).
+                GetCubeWithColumnsAsRowsTranspose().toRectangle(square.GetColumnsNumber(),
+                square.GetRowsNumber())), true) });
+            partitions.Add("symbols", new List<string>() { GetPartitionsForRows(
+                GetTriplietsFromSquare(new Cube(square).
+                GetCubeWithSymbolsAsRowsTranspose().toRectangle(square.SymbolCount(),
+                square.GetColumnsNumber())), true) });
+
+            partitions.Add("rowsG", new List<string>() { GetPartitionsForRows(comparisonMatrices["rows"]) });
+            partitions.Add("colsG", new List<string>() { GetPartitionsForRows(comparisonMatrices["cols"]) });
+            partitions.Add("symbolsG", new List<string>() { GetPartitionsForRows(comparisonMatrices["symbols"]) });
+        }
+
+        public bool IsPartitionTrivial(bool G = false)
+        {
+            string pattern = @"\{[0-9a-zA-Z^\)]+\}";
+            int a = Regex.Matches(partitions[G ? "rowsG" : "rows"][0], pattern).Count == square.GetRowsNumber() ? 1 : 0;
+            int b = Regex.Matches(partitions[G ? "colsG" : "cols"][0], pattern).Count == square.GetColumnsNumber() ? 1 : 0;
+            int c = Regex.Matches(partitions[G ? "symbolsG" : "symbols"][0], pattern).Count == square.SymbolCount() ? 1 : 0;
+            return (a + b + c) >= 2;
         }
 
         private string[,] GetTriplietsFromSquare(Rectangle square)
@@ -67,7 +102,7 @@ namespace LatinSquares.Models
             return colsTripletValues;
         }
 
-        private string GetPartitionsForRows(string [,] tripletValues)
+        private string GetPartitionsForRows(string [,] tripletValues, bool useSymbols = false)
         {
             var rows = new List<string[]>();
             for (int i = 0; i < tripletValues.GetLength(0); i++)
@@ -96,7 +131,7 @@ namespace LatinSquares.Models
                 rowsString += "{";
                 foreach (int n in p.Value)
                 {
-                    rowsString += (n + 1) + ",";
+                    rowsString += (useSymbols ? Utils.SYMBOLS[n] : ((n + 1) + "")) + ",";
                 }
                 rowsString = rowsString.Substring(0, rowsString.Length - 1) + "},";
             }
@@ -129,14 +164,38 @@ namespace LatinSquares.Models
                     square = GenerateSquareString(),
                     triplets = GenerateTripletsString(),
                     indexedTriplets = GenerateIndexedTripletsString(),
-                    partitions = partitions
-            };
+                    partitions = partitions,
+                    comparisonMatrixRows = GetMatrixString(comparisonMatrices["rows"], square.GetRowsNumber()),
+                    comparisonMatrixCols = GetMatrixString(comparisonMatrices["cols"], square.GetColumnsNumber()),
+                    comparisonMatrixSymbols = GetMatrixString(comparisonMatrices["symbols"], square.SymbolCount())
+                };
                 return JsonConvert.SerializeObject(obj);
             }
             else
             {
                 return "didn't recognize the type";
             }
+        }
+
+        private object GetMatrixString(string[,] values, int squareSize)
+        {
+            string mat = "<table class='table table-striped table-hover'><tr><th></th>";
+            for (int i = 0; i < squareSize; i++)
+            {
+                mat += "<th>(" + i + ")</th>";
+            }
+            mat += "<tr>";
+
+            for (int i = 0; i < values.GetLength(0); i++)
+            {
+                mat += "<tr><th>(" + i + ")</th>";
+                for (int j = 0; j < values.GetLength(1); j++)
+                {
+                    mat += "<td>" + values[i, j] + "</td>";
+                }
+                mat += "<tr>";
+            }
+            return mat + "</table>";
         }
 
         private string GenerateIndexedTripletsString()
@@ -213,6 +272,143 @@ namespace LatinSquares.Models
                 }
             }
             return sq;
+        }
+
+        private int IndexForValuesRow(string[,] values, int rowIndex, string value)
+        {
+            for (int i = 0; i < values.GetLength(1); i++)
+            {
+                if (values[rowIndex, i] == value) return i;
+            }
+            return -1;
+        }
+
+        private List<string> GetEdgesForTwoRows(string[,] values, int index1, int index2)
+        {
+            List<string> edges = new List<string>();
+            for (int i = 0; i < values.GetLength(1); i++)
+            {
+                if (values[index1, i] != Rectangle.EMPTY)
+                {
+                    if(values[index2, i] != Rectangle.EMPTY)
+                        edges.Add(i + "-" + i);
+                    int index = IndexForValuesRow(values, index2, values[index1, i]);
+                    if (index != -1)
+                    {
+                        edges.Add(i + "-" + index); 
+                    }
+                }
+            }
+            return edges;
+        }
+
+        private void GetPathForEdge(string edge, List<string> edges, List<string> path)
+        {
+            path.Add(edge);
+            int up, down;
+            string[] parts = edge.Split('-');
+            up = parts[0].AsInt();
+            down = parts[1].AsInt();
+            foreach (var e in edges)
+            {
+                if (path.Contains(e)) continue;
+                if (up.ToString() == e[0].ToString() || down.ToString() == e[2].ToString())
+                    GetPathForEdge(e, edges, path);
+            }
+        }
+
+        private List<string> GetGraphForTwoRows(string[,] values, int index1, int index2)
+        {
+            List<List<string>> graphRaw = new List<List<string>>();
+            var edges = GetEdgesForTwoRows(values, index1, index2);
+            while (edges.Count > 0)
+            {
+                var path = new List<string>();
+                GetPathForEdge(edges[0], edges, path);
+                foreach (var e in path)
+                {
+                    edges.Remove(e);
+                }
+                graphRaw.Add(path);
+            }
+            var graph = new List<string>();
+            foreach (var p in graphRaw)
+            {
+                int up = p.Select(x => x.Split('-')[0]).Distinct().Count();
+                int down = p.Select(x => x.Split('-')[1]).Distinct().Count();
+                int count = p.Count;
+                int diagonal = p.Where(x => x.Split('-')[0] == x.Split('-')[1]).Count();
+                graph.Add(up + "-" + down + "-" + count + "-" + diagonal);
+            }
+            return graph;
+        }
+
+
+        private bool IsIsomorphic(List<string> graph1, List<string> graph2)
+        {
+            if (graph1.Count != graph2.Count) return false;
+            foreach (var p in graph1)
+            {
+                if (graph1.Where(x => x == p).Count() != graph2.Where(x => x == p).Count()) return false;
+            }
+            return true;
+        }
+
+        private string[,] GetComparisonMatrix(string[,] values)
+        {
+            Dictionary<string, List<string>> graphCodes = new Dictionary<string, List<string>>();
+            for (int i = 0; i < values.GetLength(0); i++)
+            {
+                for (int j = 0; j < values.GetLength(0); j++)
+                {
+                    if (i == j) continue;
+                    var graph = GetGraphForTwoRows(values, i, j);
+                    string graphCode = GetCodeForGraph(graph);
+                    string index = "(" + i + "," + j + ")";
+                    if (graphCodes.Any(x => x.Key == graphCode))
+                    {
+                        graphCodes[graphCode].Add(index);
+                    }
+                    else
+                    {
+                        var list = new List<string>();
+                        list.Add(index);
+                        graphCodes.Add(graphCode, list);
+                    }
+                }
+            }
+            var matrix = new string[values.GetLength(0), values.GetLength(0)];
+            int num = 1;
+            foreach (var pair in graphCodes)
+            {
+                var code = pair.Key;
+                var indices = pair.Value;
+                foreach (var index in indices)
+                {
+                    var parts = index.Replace("(", "").Replace(")", "").Split(',');
+                    int i = parts[0].AsInt();
+                    int j = parts[1].AsInt();
+                    matrix[i, j] = "" + num;
+                }
+                num++;
+            }
+            return matrix;
+        }
+
+        private string GetCodeForGraph(List<string> graph)
+        {
+            graph.Sort();
+            string code = "";
+            foreach (var subGraph in graph)
+            {
+                code += "#" + subGraph;
+            }
+            return code;
+        }
+
+        private void RefinePartitions()
+        {
+
         }
     }
 }

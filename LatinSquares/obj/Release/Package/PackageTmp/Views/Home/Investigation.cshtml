@@ -39,41 +39,60 @@
     <p>investigate a PLR, see if it's guilty.</p>
 </div>
 <div class="row">
-
-    <div class="col-md-3">
-        <h2>The rectangle</h2>
-        <label>Click 'PLR' to generate a rectangle, 'Edit' to edit it, and 'Go' to start the investigation. Good luck!</label>
-        <hr />
-        <div id="initialSquareDiv"><pre>your PLR will appear here</pre></div>
-        <div><textarea rows="5" class="form-control hidden" id="squareInput"></textarea></div>
-        <button class="btn btn-primary btn-lg pull-left" id="randomSquareBtn">PLR</button>    
-        <button class="btn btn-success btn-lg pull-left margin-left-10" id="editBtn">Edit</button> 
-        <button class="btn btn-info btn-lg pull-left margin-left-10" id="goBtn">Go</button> 
+    <h2>The rectangle</h2>
+    <label>Click 'PLR' to generate a rectangle, 'Edit' to edit it, and 'Go' to start the investigation. Good luck!</label>
+    <hr />
+    <div id="initialSquareDiv"><pre>your PLR will appear here</pre></div>
+    <div><textarea rows="5" class="form-control hidden" id="squareInput"></textarea></div>
+    <button class="btn btn-primary btn-lg pull-left" id="randomSquareBtn">PLR</button>
+    <button class="btn btn-success btn-lg pull-left margin-left-10" id="editBtn">Edit</button>
+    <button class="btn btn-info btn-lg pull-left margin-left-10" id="goBtn">Go</button>
+</div>
+<div class="row">
+    <div class="col-md-8">
+        
+        <br />
+        <br />
+        <div class="hidden" id="tripletsRow">
+            <h2>Strong Entry Invariant</h2>
+            <label>we're counting non empty cells in rows, columns, and no. of symbols in the whole PLR, into these triplets, which allow us to extract an ER with which we can further investigate. </label>
+            <hr />
+            <div id="tripletsDiv"></div>
+            <button class="hidden btn btn-primary btn-lg pull-left" id="tripletsIncreaseFontSize"><i class="glyphicon glyphicon-plus"></i></button>
+            <button class="hidden btn btn-default btn-lg pull-right" id="tripletsDecreaseFontSize"><i class="glyphicon glyphicon-minus"></i></button>
+        </div>
+        <br />
+        <div class="hidden" id="ERRow">
+            <h2>Basic Partitions</h2>
+            <label>We're calculating partitions from the strong entry invariant matrix by counting non-empty indices in row and column and number of symbols in matrix<br /> </label>
+            <hr />
+            <div id="ERDiv"></div>
+            <button class="btn btn-success btn-lg" style="margin-top: 20px !important;" id="refine">refine partition</button>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="hidden" id="comparisonMatrix">
+            <h2>Comparison Matrices</h2>
+            <label>For each two rows, cols and symbols, we check for isomorphism, and display those isomorphisms in a matrix.<br /> </label>
+            <hr />
+            <div id="comparisonMatrixDiv"></div>
+            <button class="btn btn-primary btn-lg" style="margin-top: 20px !important;" id="refineG">refine partition</button>
+        </div>
     </div>
 
-    <div class="col-md-5 hidden" id="tripletsRow">
-        <h2>Strong Entry Invariant</h2>
-        <label>we're counting non empty cells in rows, columns, and no. of symbols in the whole PLR, into these triplets, which allow us to extract an ER with which we can further investigate. </label>
-        <hr />
-        <div id="tripletsDiv"></div>
-        <button class="hidden btn btn-primary btn-lg pull-left" id="tripletsIncreaseFontSize"><i class="glyphicon glyphicon-plus"></i></button>
-        <button class="hidden btn btn-default btn-lg pull-right" id="tripletsDecreaseFontSize"><i class="glyphicon glyphicon-minus"></i></button>
-    </div>
+    
 
-    <div class="col-md-4 hidden" id="ERRow">
-        <h2>Basic Partitions</h2>
-        <label>We're calculating partitions from the strong entry invariant matrix by counting non-empty indices in row and column and number of symbols in matrix<br /> </label>
-        <hr />
-        <div id="ERDiv"></div>
-    </div>
+   
 </div>
 
 @section scripts{
     <script>
-        $(document).ready(function () {          
+        $(document).ready(function () {
+            var investigationObj;
+
             $("#randomSquareBtn").click(function () {
                 $.ajax({
-                    url: "/api/GetNonTrivialRectangles?howMany=1", //"/api/GetFullRectangle?rows=" + 5 + "&cols=" + 5 + "&symbols=" + 5 + "&count=" + 23
+                    url: "/api/GetNonTrivialRectangles?howMany=1", //"/api/GetFullRectangle?rows=" + 5 + "&cols=" + 5 + "&symbols=" + 5 + "&count=" + 23, //
                     type: "get",
                     success: function (data) {
                         $("#initialSquareDiv").html("<pre><code>" + data + "</code></pre>");
@@ -93,22 +112,30 @@
             $("#editBtn").click(function () {
                 $("#squareInput").toggleClass("hidden");
             });
-
+   
             $("#goBtn").click(function () {
                 $("#tripletsRow").removeClass("hidden");
                 let squareString = $("#initialSquareDiv").text();
                 $("#ERRow").removeClass("hidden");
-                console.log(squareString);
+                $("#comparisonMatrix").removeClass("hidden");
                 $.ajax({
                     url: "/api/GetInvestigationObjectForRectangle?&squareString=" + squareString,
                     type: "get",
                     success: function (data) {
                         console.log(data);
                         let obj = JSON.parse(data);
-                        $("#tripletsDiv").html("<div>" + obj.triplets + "</div><div style='margin-top:10px;'>" + obj.indexedTriplets + "</div>");
-                        $("#ERDiv").html("<pre><code>" + "rows: " + obj.partitions["rows"] +
-                            "\ncolumns: " + obj.partitions["cols"] +
-                            "\nsymbols: " + obj.partitions["symbols"] + "</code></pre>");
+                        investigationObj = obj;
+                        $("#tripletsDiv").html("<div>" + obj.triplets + "</div><div style='margin-top:10px;' id='indexedTripletsDiv'>" + obj.indexedTriplets + "</div>");
+                        $("#ERDiv").html("<pre><code>" + "rows: " + obj.partitions["rows"][0] +
+                            "\ncolumns: " + obj.partitions["cols"][0] +
+                            "\nsymbols: " + obj.partitions["symbols"][0] + "</code></pre>");
+                        $("#comparisonMatrixDiv").html("<b>rows</b>" + obj.comparisonMatrixRows + "<b>cols</b>" +
+                            obj.comparisonMatrixCols + "<b>symbols</b>" +
+                            obj.comparisonMatrixSymbols + "<br />" + 
+                            "<pre><code>" + "rows: " + obj.partitions["rowsG"][0] +
+                            "\ncolumns: " + obj.partitions["colsG"][0] +
+                            "\nsymbols: " + obj.partitions["symbolsG"][0] + "</code></pre>");
+  
                     },
                     error: function (err) {
                         console.log(err);
@@ -142,8 +169,42 @@
                 $("#tripletsDiv").find("code").css({ 'font-size': fontSize });
             });
 
-            $("#initialSquareDiv").click(function () {
+            function indexThatContains(e, stringArr) {
+                for (index = 0; index < stringArr.length; index++) {
+                    if (stringArr[index].includes(e)) return index + 1;
+                }
+                return -1;
+            }
+         
+            $("#refine").click(function () {
+                let squareRows = [];
+                let s = $("#initialSquareDiv").text().split("][");
+                $.each(s, function () {
+                    squareRows.push(this.replace("[", "").replace("]","").split(" "));
+                });
+
+                let partitionRow = investigationObj["partitions"].rows[0]
+                    .replaceAll("[", "").replaceAll("]", "").replaceAll("}", "").replace("{", "").split(",{");
+                let partitionCol = investigationObj["partitions"].cols[0]
+                    .replaceAll("[", "").replaceAll("]", "").replaceAll("}", "").replace("{", "").split(",{");
+                let partitionSymbol = investigationObj["partitions"].symbols[0]
+                    .replaceAll("[", "").replaceAll("]", "").replaceAll("}", "").replace("{", "").split(",{");
                 
+                let triplets = [];
+                for (i = 0; i < squareRows.length; i++) {
+                    let tripletsRow = [];
+                    for (j = 0; j < squareRows[i].length; j++) {
+                        if (squareRows[i][j] == ".")
+                            tripletsRow.push(".");
+                        else 
+                            tripletsRow.push("(" + indexThatContains(i + 1, partitionRow) + "," +
+                             indexThatContains(j + 1, partitionCol) + ","
+                                + indexThatContains(squareRows[i][j], partitionSymbol) + ")"); 
+                    }
+                    triplets.push(tripletsRow);
+                }
+                console.log(squareRows);
+                console.log(triplets);
             });
 
         });

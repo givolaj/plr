@@ -31,23 +31,24 @@
         <hr />
 
         <div class="form-group">
+            <label for="type"> type of PLR, the method of creating it </label>
+            <select class="form-control margin-bottom-10" id="type">              
+            </select>
+
             <label for="rows">Rows</label>
-            <input class="form-control margin-bottom-10" type="number" id="rows" placeholder="rows" />
+            <select class="form-control margin-bottom-10" type="number" id="rows" placeholder="rows">
+            </select>
 
             <label for="cols">Columns</label>
-            <input class="form-control margin-bottom-10" type="number" id="cols" placeholder="columns" />
-
-            <label for="symbols"> Number of Symbols in language</label>
-            <input class="form-control margin-bottom-10" type="number" id="symbols" placeholder="Number of Symbols in language" />
-
-            <label for="count"> Number of symbols in matrix </label>
-            <input class="form-control margin-bottom-10" type="number" id="count" placeholder="Number of symbols in matrix" />
+            <select class="form-control margin-bottom-10" type="number" id="cols" placeholder="columns">
+            </select>
             
-            <label for="type"> type of PLR, the method of creating it </label>
-            <select class="form-control margin-bottom-10" id="type">
-                <option>empty</option>
-                <option>full</option>
-                <option>non-trivial</option>
+            <label for="symbols"> Number of Symbols in language</label>
+            <select class="form-control margin-bottom-10" type="number" id="symbols" placeholder="Number of Symbols in language">
+            </select>
+            
+            <label for="count"> Number of symbols in matrix </label>
+            <select class="form-control margin-bottom-10" type="number" id="count" placeholder="Number of symbols in matrix">
             </select>
 
             <br />
@@ -63,10 +64,85 @@
         <div id="output"></div>
     </div>
 
+    <div class="col-md-4">
+        <h2>Download a file</h2>
+        <label>Download a file with a number of rectangles. </label>
+        <hr />
+        <input class="form-control margin-bottom-10" type="number" id="batch" placeholder="Number of rectangles in file" />
+        <button class="btn btn-success" id="generateBatch">Download</button>
+        <p id="errorBatch"></p>
+
+        <br />
+        <h2 id="checkTitle">Upload PLRs for for check</h2>
+        <label>we'll return the percentage of PLRs who got a trivial partition on the first round of partition D.</label>
+        <hr />
+
+        <div><textarea rows="5" class="form-control" id="checkInputArea"></textarea></div>
+        <div>
+            <button class="btn btn-success" style="margin-top: 5px;" id="check">Check</button>
+        </div>
+        <div class="checkbox" style="margin:10px;">
+            <label><input type="checkbox" id="format1" value="" checked="checked">website format</label>
+        </div>
+        <div class="checkbox" style="margin:10px;">
+            <label><input type="checkbox" id="format2" value="">1 square(!) per line format</label>
+        </div>
+</div>
+
 </div>
 @section scripts{
     <script>
         $(document).ready(function () {
+            var info = JSON.parse(@Html.Raw(Json.Encode(ViewBag.info)));
+
+            $("#symbols").change(function () {
+                let type = $("#type").val();
+                let rows = $("#rows").val();
+                let cols = $("#cols").val();
+                let symbols = $("#symbols").val();
+                $("#count").empty();
+                $.each(info[type][rows][cols][symbols], function (index) {
+                    $("#count").append("<option>" + index + "</option>");
+                });
+                $("#count").trigger('change');
+            });
+
+            $("#cols").change(function () {
+                let type = $("#type").val();
+                let rows = $("#rows").val();
+                let cols = $("#cols").val();
+                $("#symbols").empty();
+                $.each(info[type][rows][cols], function (index) {
+                    $("#symbols").append("<option>" + index + "</option>");
+                });
+                $("#symbols").trigger('change');
+            });
+
+            $("#rows").change(function () {
+                let type = $("#type").val();
+                let rows = $("#rows").val();
+                $("#cols").empty();
+                $.each(info[type][rows], function (index) {
+                    $("#cols").append("<option>" + index + "</option>");
+                });
+                $("#cols").trigger('change');
+            });
+
+            $("#type").change(function () {
+                let type = $("#type").val();
+                $("#rows").empty();
+                $.each(info[type], function (index) {
+                    $("#rows").append("<option>" + index + "</option>");
+                });
+                $("#rows").trigger('change');
+            });
+
+            $("#type").empty();
+            $.each(info, function (index) {
+                $("#type").append("<option>" + index + "</option>");
+            });
+            $("#type").trigger('change');
+
             $("#generate").click(function () {
                 let rows = $("#rows").val();
                 let cols = $("#cols").val();
@@ -108,13 +184,88 @@
                 $.ajax({
                     url: "/api/GetRectangleFromDb?rows=" + rows + "&cols=" + cols + "&symbols=" + symbols + "&count=" + count + "&type=" + type,
                     type: "get",
-                    success: function (data) {   
+                    success: function (data) {
                         $("#output").html("<pre><code>" + data + "</code></pre>");
                     },
                     error: function (err) {
                         console.log(err);
                     }
                 });
+            });
+
+            $("#generateBatch").click(function () {
+                let rows = $("#rows").val();
+                let cols = $("#cols").val();
+                let symbols = $("#symbols").val();
+                let count = $("#count").val();
+                let type = $("#type").val();
+                let number = $("#batch").val();
+
+                if (rows == "") $("#rows").addClass("error");
+                else $("#rows").removeClass("error");
+
+                if (cols == "") $("#cols").addClass("error");
+                else $("#cols").removeClass("error");
+
+                if (symbols == "") $("#symbols").addClass("error");
+                else $("#symbols").removeClass("error");
+
+                if (count == "") count = Number(rows) * Number(cols);
+
+                if (rows == "" ||
+                    cols == "" ||
+                    symbols == "" ||
+                    Number(rows) > Number(symbols) ||
+                    Number(cols) > Number(symbols)) {
+                    $("#rows").addClass("error");
+                    $("#symbols").addClass("error");
+                    $("#error").html("can't have more rows and columns than symbols");
+                    return;
+                }
+
+                if (Number(count) > Number(rows) * Number(cols)) {
+                    $("#count").addClass("error");
+                    $("#error").html("come on buddy..");
+                    return;
+                }
+
+                $("#count").removeClass("error");
+                $("#error").html();
+
+                $.ajax({
+                    url: "/api/GetRectangleFromDb?rows=" + rows + "&cols=" + cols + "&symbols=" + symbols + "&count=" + count + "&type=" + type + "&number=" + number,
+                    type: "get",
+                    success: function (data) {
+                        download(data, "rectangles", "txt");
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+            });
+
+            $("#check").click(function () {
+                $("#checkTitle").text("Working...");
+                let flag = $("#format1").prop('checked') == "";
+                $.ajax({
+                    url: "/api/checkRectangles/" + flag,
+                    type: "post",
+                    data: JSON.stringify($("#checkInputArea").val()),
+                    contentType: "application/json",
+                    success: function (data) {
+                        $("#checkTitle").text("Upload PLRs for for check");
+                        download(data, "checkResults", "txt");
+                        alert('a file with the check result is being downloaded to your computer');
+                    },
+                    error: function (err) {
+                        console.log(err);
+                    }
+                });
+            });
+
+            $("input[type='checkbox']").change(function () {
+                $("input[type='checkbox']").prop('checked', false);
+                $(this).prop('checked', 'checked');
             });
         });
     </script>

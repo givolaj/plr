@@ -57,12 +57,19 @@
         <button class="btn btn-info btn-lg pull-left margin-left-10" id="goBtn">Go</button>
     </div>
 
-    <div class="col-md-6 hidden" id="simulationRow">
+    <div class="col-md-5 hidden" id="simulationRow">
         <h2>Graph</h2>
         <label>We're drawing a graph between two rows, drawing a solid line vertically and a dotted line diagonally where the numbers are equal.</label>
         <hr />
-        <canvas id="simulationCanvas" width="500" height="300" style="background-color: #f0f0f0; border:1px solid #a0a0a0;"></canvas>
-</div>
+        <canvas id="simulationCanvas" width="450" height="300" style="background-color: #f0f0f0; border:1px solid #a0a0a0;"></canvas>
+    </div>
+
+    <div class="col-md-4 hidden" id="subgrpahRow">
+        <h2>Subgraphs</h2>
+        <label>Theses are all connected paths in the graphs, used to determine isomorphism, with their respected IDs.</label>  
+        <hr />
+        <canvas id="subgraphsCanvas" width="300" height="300" style="background-color: #f0f0f0; border:1px solid #a0a0a0;"></canvas>
+    </div>
 </div>
 
 @section scripts{
@@ -96,9 +103,23 @@
             });
 
             $("#squareInput").on("input", function (e) {
+                row1 = undefined;
+                row2 = undefined;
                 let val = $("#squareInput").val();
-                val = val.replaceAll("] [", "]\n[");
-                $("#initialSquareDiv").html("<pre><code>" + val + "</code></pre>");
+                let rows = val.split("]");
+                let newVal = "";
+                for(i=0;i<rows.length-1;i++){
+                    let row = rows[i].replace("[", "").replace("]", "").replace("\n", "").replace("[", "");
+                    let cols = row.split(" ");
+                    newVal += "[";
+                    for (j = 0; j < cols.length; j++) {
+                        let col = cols[j];
+                        let space = j == 0 || j == cols.length ? "" : " ";
+                        newVal += space + '<span class="matrix-cell row-' + i + ' col-' + j + '">' + col + '</span>';
+                    }
+                    newVal += "]\n";
+                };
+                $("#initialSquareDiv").html("<pre><code>" + newVal + "</code></pre>");
             });
 
             $("#editBtn").click(function () {
@@ -111,13 +132,15 @@
                     return;
                 }
                 $("#simulationRow").removeClass("hidden");
+                $("#subgrpahRow").removeClass("hidden");
                 addGraphToCanvas();
             });
 
             function addGraphToCanvas() {
+                let edges = [];
                 let canvas = document.getElementById("simulationCanvas");
                 let ctx = canvas.getContext("2d");
-                let width = 400;
+                let width = 360;
                 ctx.clearRect(0,0,600,300);
                 ctx.font = "20px Roboto bold";
                 ctx.fillStyle = '#c55';
@@ -128,37 +151,38 @@
                     let row = $(this).attr('class').split(/\s+/)[1];
                     let col = $(this).attr('class').split(/\s+/)[2].split('-')[1];
                     let digit = $(this).text();
-                    if (digit == ".") digit = "_";                 
+                    if (digit.indexOf(".") >= 0) digit = "_";                 
                     if (row == row1) {
-                        let x = 75 + col * width / cols;
+                        let x = 60 + col * width / cols;
                         let y = 60;
                         ctx.fillText(digit, x, y);
                         if (verticalMap[col] == undefined) verticalMap[col] = {};
                         verticalMap[col][0] = { x: x, y: y, digit: digit };
                         if (digit != "_") {
                             if (horizontalMap[digit] == undefined) horizontalMap[digit] = {};
-                            if (horizontalMap[digit][0] == undefined) horizontalMap[digit][0] = { x: x, y: y };
-                            else if (horizontalMap[digit][1] == undefined) horizontalMap[digit][1] = { x: x, y: y };
+                            if (horizontalMap[digit][0] == undefined) horizontalMap[digit][0] = { x: x, y: y, top: col };
+                            else if (horizontalMap[digit][1] == undefined) horizontalMap[digit][1] = { x: x, y: y, top: col };
                         }
                     }
                     if (row == row2) {
-                        let x = 75 + col * width / cols;
+                        let x = 60 + col * width / cols;
                         let y = 240;
                         ctx.fillText(digit, x, y);
                         if (verticalMap[col] == undefined) verticalMap[col] = {};
                         verticalMap[col][1] = { x: x, y: y, digit: digit };
                         if (digit != "_") {
                             if (horizontalMap[digit] == undefined) horizontalMap[digit] = {};
-                            if (horizontalMap[digit][0] == undefined) horizontalMap[digit][0] = { x: x, y: y };
-                            else if (horizontalMap[digit][1] == undefined) horizontalMap[digit][1] = { x: x, y: y };
+                            if (horizontalMap[digit][0] == undefined) horizontalMap[digit][0] = { x: x, y: y, bottom: col };
+                            else if (horizontalMap[digit][1] == undefined) horizontalMap[digit][1] = { x: x, y: y, bottom: col };
                         }
                     }
                 });
 
                 ctx.beginPath();
                 ctx.strokeStyle = "#44bb66";
-                $.each(verticalMap, function () {
+                $.each(verticalMap, function (index) {
                     if (this[0].digit != "_" && this[1].digit != "_") {
+                        edges.push({ top: index, bottom: index });
                         ctx.moveTo(this[0].x + 5, this[0].y + 10);
                         ctx.lineTo(this[1].x + 5, this[1].y - 25);
                         ctx.stroke();
@@ -168,9 +192,13 @@
 
                 ctx.beginPath();
                 ctx.strokeStyle = "#4466bb";
+                console.log(horizontalMap);
                 $.each(horizontalMap, function () {
-                    console.log(this);
-                    if (this[1] != undefined) {
+                    if (this[1] != undefined) { //if there's an edge
+                        if (this[0].bottom == undefined)
+                            edges.push({ top: this[0].top, bottom: this[1].bottom });
+                        else
+                            edges.push({ top: this[1].top, bottom: this[0].bottom });
                         if (this[0].y > this[1].y) {
                             ctx.moveTo(this[0].x + 5, this[0].y - 25);
                             ctx.lineTo(this[1].x + 5, this[1].y + 10);
@@ -182,6 +210,77 @@
                     }
                 });
                 ctx.closePath();
+
+                canvas = document.getElementById("subgraphsCanvas");
+                ctx = canvas.getContext("2d");
+                width = 220;
+                ctx.clearRect(0, 0, 600, 300);
+                ctx.fillStyle = '#525252';
+                ctx.lineWidth = 3;
+
+                let paths = getPaths(edges);
+
+                $.each(paths, function (index, path) {
+                    let y = index * 70 + 40;
+
+                    let maxIndex = 0, minIndex = 10000;
+                    $.each(path, function () {
+                        if (this.top > maxIndex)
+                            maxIndex = this.top;
+                        if (this.bottom > maxIndex)
+                            maxIndex = this.bottom;
+
+                        if (this.top < minIndex)
+                            minIndex = this.top;
+                        if (this.bottom < minIndex)
+                            minIndex = this.bottom;
+                    });
+                    let colWidth = 10* width / (maxIndex + 1);
+
+                    $.each(path, function () {
+                        ctx.beginPath();
+                        ctx.strokeStyle = "#525252";
+                        let top = Number(this.top) - minIndex;
+                        let bottom = Number(this.bottom) - minIndex;
+                        ctx.moveTo(40 + top * colWidth, y + 10);
+                        ctx.lineTo(40 + bottom * colWidth, y + 60);
+                        ctx.stroke();
+                        ctx.closePath();
+                    });
+     
+                });
+
+                getIdentifierFromPaths(paths);
+            }
+
+            function getPaths(edges) {
+                let paths = [];
+                let path;
+                while (edges.length > 0) {
+                    path = [];
+                    getPathForEdge(edges[0], edges, path);
+                    paths.push(path);
+                    $.each(path, function () {
+                        let index = edges.indexOf(this);
+                        edges.splice(index, 1);
+                    });
+                }
+                return paths;
+            }
+
+            function getPathForEdge(edge, edges, path) {
+                let top = edge.top;
+                let bottom = edge.bottom;
+                path.push(edge);
+                $.each(edges, function () {
+                    if (path.includes(this)) return;
+                    if (this.top == top || this.bottom == bottom)
+                        getPathForEdge(this, edges, path);
+                });
+            }
+
+            function getIdentifierFromPaths(paths) {
+                console.log(paths);
             }
 
             var row1 = undefined;
