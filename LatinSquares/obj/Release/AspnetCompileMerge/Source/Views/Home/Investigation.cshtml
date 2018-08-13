@@ -49,7 +49,7 @@
     <button class="btn btn-info btn-lg pull-left margin-left-10" id="goBtn">Go</button>
 </div>
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-7">
         
         <br />
         <br />
@@ -67,10 +67,10 @@
             <label>We're calculating partitions from the strong entry invariant matrix by counting non-empty indices in row and column and number of symbols in matrix<br /> </label>
             <hr />
             <div id="ERDiv"></div>
-            <button class="btn btn-success btn-lg" style="margin-top: 20px !important;" id="refine">refine partition</button>
+            <button class="btn btn-success btn-lg" style="margin-top: 20px !important;" id="refineN">refine partition</button>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-5">
         <div class="hidden" id="comparisonMatrix">
             <h2>Comparison Matrices</h2>
             <label>For each two rows, cols and symbols, we check for isomorphism, and display those isomorphisms in a matrix.<br /> </label>
@@ -112,7 +112,23 @@
             $("#editBtn").click(function () {
                 $("#squareInput").toggleClass("hidden");
             });
-   
+
+            var partitionsNIndex = 0;
+            function drawPartitionsN() {
+                if (partitionsNIndex >= investigationObj.partitionsN.length) return;
+                $("#ERDiv").html("<pre><code>" + "rows: " + investigationObj.partitionsN[partitionsNIndex]["rows"] +
+                    "\ncolumns: " + investigationObj.partitionsN[partitionsNIndex]["cols"] +
+                    "\nsymbols: " + investigationObj.partitionsN[partitionsNIndex]["symbols"] + "</code></pre>");
+            }
+            function drawPartitionsG() {
+                $("#comparisonMatrixDiv").html("<b>rows</b>" + investigationObj.comparisonMatrixRows + "<b>cols</b>" +
+                    investigationObj.comparisonMatrixCols + "<b>symbols</b>" +
+                    investigationObj.comparisonMatrixSymbols + "<br />" +
+                    "<pre><code>" + "rows: " + investigationObj.partitionsG["rows"] +
+                    "\ncolumns: " + investigationObj.partitionsG["cols"] +
+                    "\nsymbols: " + investigationObj.partitionsG["symbols"] + "</code></pre>");
+            }
+
             $("#goBtn").click(function () {
                 $("#tripletsRow").removeClass("hidden");
                 let squareString = $("#initialSquareDiv").text();
@@ -122,20 +138,10 @@
                     url: "/api/GetInvestigationObjectForRectangle?&squareString=" + squareString,
                     type: "get",
                     success: function (data) {
-                        console.log(data);
-                        let obj = JSON.parse(data);
-                        investigationObj = obj;
-                        $("#tripletsDiv").html("<div>" + obj.triplets + "</div><div style='margin-top:10px;' id='indexedTripletsDiv'>" + obj.indexedTriplets + "</div>");
-                        $("#ERDiv").html("<pre><code>" + "rows: " + obj.partitions["rows"][0] +
-                            "\ncolumns: " + obj.partitions["cols"][0] +
-                            "\nsymbols: " + obj.partitions["symbols"][0] + "</code></pre>");
-                        $("#comparisonMatrixDiv").html("<b>rows</b>" + obj.comparisonMatrixRows + "<b>cols</b>" +
-                            obj.comparisonMatrixCols + "<b>symbols</b>" +
-                            obj.comparisonMatrixSymbols + "<br />" + 
-                            "<pre><code>" + "rows: " + obj.partitions["rowsG"][0] +
-                            "\ncolumns: " + obj.partitions["colsG"][0] +
-                            "\nsymbols: " + obj.partitions["symbolsG"][0] + "</code></pre>");
-  
+                        investigationObj = JSON.parse(data);
+                        $("#tripletsDiv").html("<div>" + investigationObj.triplets + "</div><div style='margin-top:10px;' id='indexedTripletsDiv'>" + investigationObj.indexedTriplets + "</div>");
+                        drawPartitionsN();
+                        drawPartitionsG();
                     },
                     error: function (err) {
                         console.log(err);
@@ -176,35 +182,9 @@
                 return -1;
             }
          
-            $("#refine").click(function () {
-                let squareRows = [];
-                let s = $("#initialSquareDiv").text().split("][");
-                $.each(s, function () {
-                    squareRows.push(this.replace("[", "").replace("]","").split(" "));
-                });
-
-                let partitionRow = investigationObj["partitions"].rows[0]
-                    .replaceAll("[", "").replaceAll("]", "").replaceAll("}", "").replace("{", "").split(",{");
-                let partitionCol = investigationObj["partitions"].cols[0]
-                    .replaceAll("[", "").replaceAll("]", "").replaceAll("}", "").replace("{", "").split(",{");
-                let partitionSymbol = investigationObj["partitions"].symbols[0]
-                    .replaceAll("[", "").replaceAll("]", "").replaceAll("}", "").replace("{", "").split(",{");
-                
-                let triplets = [];
-                for (i = 0; i < squareRows.length; i++) {
-                    let tripletsRow = [];
-                    for (j = 0; j < squareRows[i].length; j++) {
-                        if (squareRows[i][j] == ".")
-                            tripletsRow.push(".");
-                        else 
-                            tripletsRow.push("(" + indexThatContains(i + 1, partitionRow) + "," +
-                             indexThatContains(j + 1, partitionCol) + ","
-                                + indexThatContains(squareRows[i][j], partitionSymbol) + ")"); 
-                    }
-                    triplets.push(tripletsRow);
-                }
-                console.log(squareRows);
-                console.log(triplets);
+            $("#refineN").click(function () {
+                partitionsNIndex++;
+                drawPartitionsN();
             });
 
         });

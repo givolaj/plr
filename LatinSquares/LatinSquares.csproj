@@ -202,6 +202,8 @@
     <Compile Include="Models\Cube.cs" />
     <Compile Include="Models\InvestigationObject.cs" />
     <Compile Include="Models\DbModels.cs" />
+    <Compile Include="Models\PartitionsSet.cs" />
+    <Compile Include="Models\Partition.cs" />
     <Compile Include="Models\Rectangle.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\Utils.cs" />

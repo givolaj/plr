@@ -15,7 +15,7 @@ namespace LatinSquares.Models
         private Cube cube;
         private string[,] tripletValues;
         private Dictionary<string, string[,]> comparisonMatrices;
-        public Dictionary<string, List<string>> partitions;
+        public List<PartitionsSet> partitionsN, partitionsG;
 
         public InvestigationObject(string squareString)
         {
@@ -32,35 +32,56 @@ namespace LatinSquares.Models
                 GetCubeWithColumnsAsRowsTranspose().toRectangle(square.GetColumnsNumber(),
                 square.GetRowsNumber()).values));
             comparisonMatrices.Add("symbols", GetComparisonMatrix(new Cube(square).
-                GetCubeWithSymbolsAsRowsTranspose().toRectangle(square.GetColumnsNumber(),
-                square.GetRowsNumber()).values));
+                GetCubeWithSymbolsAsRowsTranspose().toRectangle(square.SymbolCount(),
+                square.GetColumnsNumber()).values));
 
             tripletValues = GetTriplietsFromSquare(square);
+            partitionsN = new List<PartitionsSet>();
+            partitionsG = new List<PartitionsSet>();
 
-            partitions = new Dictionary<string, List<string>>();
-            partitions.Add("rows", new List<string>() { GetPartitionsForRows(tripletValues) });
-            partitions.Add("cols", new List<string>() {
-                //GetPartitionsForRows(GetTripletsInOrder(tripletValues, 1,0,2)) });
+            partitionsN.Add(new PartitionsSet(
+                GetPartitionsForRows(tripletValues, true),
                 GetPartitionsForRows(
                 GetTriplietsFromSquare(new Cube(square).
                 GetCubeWithColumnsAsRowsTranspose().toRectangle(square.GetColumnsNumber(),
-                square.GetRowsNumber())), true) });
-            partitions.Add("symbols", new List<string>() { GetPartitionsForRows(
+                square.GetRowsNumber())), true),
+                GetPartitionsForRows(
                 GetTriplietsFromSquare(new Cube(square).
                 GetCubeWithSymbolsAsRowsTranspose().toRectangle(square.SymbolCount(),
-                square.GetColumnsNumber())), true) });
+                square.GetColumnsNumber())), true)
+                ));
 
-            partitions.Add("rowsG", new List<string>() { GetPartitionsForRows(comparisonMatrices["rows"]) });
-            partitions.Add("colsG", new List<string>() { GetPartitionsForRows(comparisonMatrices["cols"]) });
-            partitions.Add("symbolsG", new List<string>() { GetPartitionsForRows(comparisonMatrices["symbols"]) });
+            do {
+                var last = partitionsN.Last();
+                var set = new PartitionsSet(
+                GetPartitionsForRows(GetTriplietsFromSquareAndPartition(square, last), true),
+                GetPartitionsForRows(
+                GetTriplietsFromSquareAndPartition(new Cube(square).
+                GetCubeWithColumnsAsRowsTranspose().toRectangle(square.GetColumnsNumber(),
+                square.GetRowsNumber()), last), true),
+                GetPartitionsForRows(
+                GetTriplietsFromSquareAndPartition(new Cube(square).
+                GetCubeWithSymbolsAsRowsTranspose().toRectangle(square.SymbolCount(),
+                square.GetColumnsNumber()), last), true));
+                if (set.AsString() == last.AsString())
+                    break;
+                partitionsN.Add(set);
+            } while (true);
+
+            partitionsG.Add(new PartitionsSet(
+                GetPartitionsForRows(comparisonMatrices["rows"], true),
+                GetPartitionsForRows(comparisonMatrices["cols"], true),
+                GetPartitionsForRows(comparisonMatrices["symbols"], true)
+                ));
         }
 
         public bool IsPartitionTrivial(bool G = false)
         {
+            PartitionsSet set = G ? partitionsG[0] : partitionsN[0];
             string pattern = @"\{[0-9a-zA-Z^\)]+\}";
-            int a = Regex.Matches(partitions[G ? "rowsG" : "rows"][0], pattern).Count == square.GetRowsNumber() ? 1 : 0;
-            int b = Regex.Matches(partitions[G ? "colsG" : "cols"][0], pattern).Count == square.GetColumnsNumber() ? 1 : 0;
-            int c = Regex.Matches(partitions[G ? "symbolsG" : "symbols"][0], pattern).Count == square.SymbolCount() ? 1 : 0;
+            int a = Regex.Matches(set.Rows.AsString(), pattern).Count == square.GetRowsNumber() ? 1 : 0;
+            int b = Regex.Matches(set.Columns.AsString(), pattern).Count == square.GetColumnsNumber() ? 1 : 0;
+            int c = Regex.Matches(set.Symbols.AsString(), pattern).Count == square.SymbolCount() ? 1 : 0;
             return (a + b + c) >= 2;
         }
 
@@ -78,6 +99,29 @@ namespace LatinSquares.Models
                             square.GetRowNonEmptySymbolCount(i) + "," +
                             square.GetColumnNonEmptySymbolCount(j) + "," +
                             square.GetNumberOfOccurencesOfSymbol(i, j) + ")";
+                }
+            }
+            return tripletValues;
+        }
+
+        private string[,] GetTriplietsFromSquareAndPartition(Rectangle square, PartitionsSet partition)
+        {
+            var tripletValues = new string[square.GetRowsNumber(), square.GetColumnsNumber()];
+            for (int i = 0; i < tripletValues.GetLength(0); i++)
+            {
+                for (int j = 0; j < tripletValues.GetLength(1); j++)
+                {
+                    if (square.values[i, j] == Rectangle.EMPTY)
+                        tripletValues[i, j] = "   -   ";
+                    else
+                    {
+                        int val = square.values[i, j].AsInt();
+                        tripletValues[i, j] = "(" +
+                            partition.Rows.Groups.FirstOrDefault(x => x.Value.Contains(val)).Key + "," +
+                            partition.Columns.Groups.FirstOrDefault(x => x.Value.Contains(val)).Key + "," +
+                            partition.Symbols.Groups.FirstOrDefault(x => x.Value.Contains(val)).Key + ")";
+
+                    }
                 }
             }
             return tripletValues;
@@ -131,12 +175,28 @@ namespace LatinSquares.Models
                 rowsString += "{";
                 foreach (int n in p.Value)
                 {
-                    rowsString += (useSymbols ? Utils.SYMBOLS[n] : ((n + 1) + "")) + ",";
+                    rowsString += (useSymbols ? Utils.SYMBOLS[n] : (n + 1) + "") + ",";
                 }
                 rowsString = rowsString.Substring(0, rowsString.Length - 1) + "},";
             }
             rowsString = rowsString.Substring(0, rowsString.Length - 1) + "]";
             return rowsString;
+        }
+
+        private PartitionsSet RefinePartition(PartitionsSet partition)
+        {
+            var triplets = GetTriplietsFromSquareAndPartition(square, partition);
+            var colTriplets = GetTriplietsFromSquareAndPartition(
+                new Cube(square).GetCubeWithColumnsAsRowsTranspose()
+                .toRectangle(square.GetColumnsNumber(), square.GetRowsNumber()), partition);
+            var symTriplets = GetTriplietsFromSquareAndPartition(new Cube(square).
+                GetCubeWithSymbolsAsRowsTranspose().toRectangle(square.SymbolCount(),
+                square.GetColumnsNumber()), partition);
+            PartitionsSet set = new PartitionsSet(
+                GetPartitionsForRows(triplets),
+                GetPartitionsForRows(colTriplets, true),
+                GetPartitionsForRows(symTriplets, true));
+            return set;
         }
 
         public string AsString(string type)
@@ -164,7 +224,8 @@ namespace LatinSquares.Models
                     square = GenerateSquareString(),
                     triplets = GenerateTripletsString(),
                     indexedTriplets = GenerateIndexedTripletsString(),
-                    partitions = partitions,
+                    partitionsN = partitionsN.Select(x => x.AsDictionary()).ToList(),
+                    partitionsG = partitionsG[0].AsDictionary(),
                     comparisonMatrixRows = GetMatrixString(comparisonMatrices["rows"], square.GetRowsNumber()),
                     comparisonMatrixCols = GetMatrixString(comparisonMatrices["cols"], square.GetColumnsNumber()),
                     comparisonMatrixSymbols = GetMatrixString(comparisonMatrices["symbols"], square.SymbolCount())
