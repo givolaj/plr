@@ -68,6 +68,7 @@
             <hr />
             <div id="ERDiv"></div>
             <button class="btn btn-success btn-lg" style="margin-top: 20px !important;" id="refineN">refine partition</button>
+            <button class="btn btn-success btn-lg" style="margin-top: 20px !important;" id="backN">back</button>
         </div>
     </div>
     <div class="col-md-5">
@@ -119,6 +120,8 @@
                 $("#ERDiv").html("<pre><code>" + "rows: " + investigationObj.partitionsN[partitionsNIndex]["rows"] +
                     "\ncolumns: " + investigationObj.partitionsN[partitionsNIndex]["cols"] +
                     "\nsymbols: " + investigationObj.partitionsN[partitionsNIndex]["symbols"] + "</code></pre>");
+                $("#tripletsDiv").html("<div>" + investigationObj.triplets[partitionsNIndex] + "</div><div style='margin-top:10px;' id='indexedTripletsDiv'>"
+                    + investigationObj.indexedTriplets + "</div>");
             }
             function drawPartitionsG() {
                 $("#comparisonMatrixDiv").html("<b>rows</b>" + investigationObj.comparisonMatrixRows + "<b>cols</b>" +
@@ -139,7 +142,7 @@
                     type: "get",
                     success: function (data) {
                         investigationObj = JSON.parse(data);
-                        $("#tripletsDiv").html("<div>" + investigationObj.triplets + "</div><div style='margin-top:10px;' id='indexedTripletsDiv'>" + investigationObj.indexedTriplets + "</div>");
+                        console.log(investigationObj);
                         drawPartitionsN();
                         drawPartitionsG();
                     },
@@ -183,10 +186,17 @@
             }
          
             $("#refineN").click(function () {
-                partitionsNIndex++;
+                if (partitionsNIndex < investigationObj.partitionsN.length - 1)
+                    partitionsNIndex++;
                 drawPartitionsN();
             });
 
+            $("#backN").click(function () {
+                if (partitionsNIndex > 0)
+                    partitionsNIndex--;
+                drawPartitionsN();
+            });
+            
         });
     </script>
 }

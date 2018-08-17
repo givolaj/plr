@@ -13,7 +13,7 @@ namespace LatinSquares.Models
     {
         private Rectangle square;
         private Cube cube;
-        private string[,] tripletValues;
+        private List<string[,]> tripletValues;
         private Dictionary<string, string[,]> comparisonMatrices;
         public List<PartitionsSet> partitionsN, partitionsG;
 
@@ -35,16 +35,18 @@ namespace LatinSquares.Models
                 GetCubeWithSymbolsAsRowsTranspose().toRectangle(square.SymbolCount(),
                 square.GetColumnsNumber()).values));
 
-            tripletValues = GetTriplietsFromSquare(square);
+            tripletValues = new List<string[,]>();
+            tripletValues.Add(GetTriplietsFromSquare(square));
+
             partitionsN = new List<PartitionsSet>();
             partitionsG = new List<PartitionsSet>();
 
             partitionsN.Add(new PartitionsSet(
-                GetPartitionsForRows(tripletValues, true),
+                GetPartitionsForRows(tripletValues[0]),
                 GetPartitionsForRows(
                 GetTriplietsFromSquare(new Cube(square).
                 GetCubeWithColumnsAsRowsTranspose().toRectangle(square.GetColumnsNumber(),
-                square.GetRowsNumber())), true),
+                square.GetRowsNumber()))),
                 GetPartitionsForRows(
                 GetTriplietsFromSquare(new Cube(square).
                 GetCubeWithSymbolsAsRowsTranspose().toRectangle(square.SymbolCount(),
@@ -54,18 +56,19 @@ namespace LatinSquares.Models
             do {
                 var last = partitionsN.Last();
                 var set = new PartitionsSet(
-                GetPartitionsForRows(GetTriplietsFromSquareAndPartition(square, last), true),
+                GetPartitionsForRows(tripletValues.Last()),
                 GetPartitionsForRows(
                 GetTriplietsFromSquareAndPartition(new Cube(square).
                 GetCubeWithColumnsAsRowsTranspose().toRectangle(square.GetColumnsNumber(),
-                square.GetRowsNumber()), last), true),
+                square.GetRowsNumber()), last.WithNewOrder(1,0,2))),
                 GetPartitionsForRows(
                 GetTriplietsFromSquareAndPartition(new Cube(square).
                 GetCubeWithSymbolsAsRowsTranspose().toRectangle(square.SymbolCount(),
-                square.GetColumnsNumber()), last), true));
+                square.GetColumnsNumber()), last.WithNewOrder(2, 1, 0)), true));
                 if (set.AsString() == last.AsString())
                     break;
                 partitionsN.Add(set);
+                tripletValues.Add(GetTriplietsFromSquareAndPartition(square, last));
             } while (true);
 
             partitionsG.Add(new PartitionsSet(
@@ -115,10 +118,11 @@ namespace LatinSquares.Models
                         tripletValues[i, j] = "   -   ";
                     else
                     {
-                        int val = square.values[i, j].AsInt();
+                        //int val = square.values[i, j].AsInt();
+                        int val = Array.IndexOf(Utils.SYMBOLS, square.values[i, j]);
                         tripletValues[i, j] = "(" +
-                            partition.Rows.Groups.FirstOrDefault(x => x.Value.Contains(val)).Key + "," +
-                            partition.Columns.Groups.FirstOrDefault(x => x.Value.Contains(val)).Key + "," +
+                            partition.Rows.Groups.FirstOrDefault(x => x.Value.Contains(i)).Key + "," +
+                            partition.Columns.Groups.FirstOrDefault(x => x.Value.Contains(j)).Key + "," +
                             partition.Symbols.Groups.FirstOrDefault(x => x.Value.Contains(val)).Key + ")";
 
                     }
@@ -211,7 +215,7 @@ namespace LatinSquares.Models
             }
             else if (type == "triplets")
             {
-                return GenerateTripletsString();
+                return GenerateTripletsString()[0];
             }
             else if (type == "tripletsIndexed")
             {
@@ -262,6 +266,7 @@ namespace LatinSquares.Models
         private string GenerateIndexedTripletsString()
         {
             Dictionary<string, string> map = new Dictionary<string, string>();
+            var tripletValues = this.tripletValues[0];
             for (int i = 0; i < tripletValues.GetLength(0); i++)
             {
                 for (int j = 0; j < tripletValues.GetLength(1); j++)
@@ -292,22 +297,27 @@ namespace LatinSquares.Models
             return tripletsString;
         }
 
-        private string GenerateTripletsString()
+        private List<string> GenerateTripletsString()
         {
-            string tripletsString = "<pre><code>";
-            for (int i = 0; i < tripletValues.GetLength(0); i++)
+            List<string> strings = new List<string>();
+            foreach(var t in this.tripletValues)
             {
-                tripletsString += "[";
-                for (int j = 0; j < tripletValues.GetLength(1); j++)
+                string tripletsString = "<pre><code>";
+                for (int i = 0; i < t.GetLength(0); i++)
                 {
-                    tripletsString += "<span class='matrix-cell row-" + i + " col-" + j + "'>" + tripletValues[i, j] + "</span>";
-                    if (j != tripletValues.GetLength(1) - 1)
-                        tripletsString += " ";
+                    tripletsString += "[";
+                    for (int j = 0; j < t.GetLength(1); j++)
+                    {
+                        tripletsString += "<span class='matrix-cell row-" + i + " col-" + j + "'>" + t[i, j] + "</span>";
+                        if (j != t.GetLength(1) - 1)
+                            tripletsString += " ";
+                    }
+                    tripletsString += "]<br />";
                 }
-                tripletsString += "]<br />";
+                tripletsString += "</code></pre>";
+                strings.Add(tripletsString);
             }
-            tripletsString += "</code></pre>";
-            return tripletsString;
+            return strings;
         }
 
         private string GenerateSquareString()

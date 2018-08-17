@@ -10,7 +10,7 @@ namespace LatinSquares.Models
     {
         public Dictionary<int, List<int>> Groups { get; set; }
 
-        public Partition(string pStr)
+        public Partition(string pStr, int type = 0)
         {
             Groups = new Dictionary<int, List<int>>();
             var parts = pStr.Replace("[", "").Replace("]", "")
