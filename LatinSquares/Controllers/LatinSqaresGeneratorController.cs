@@ -12,6 +12,8 @@ namespace LatinSquares.Controllers
 {
     public class LatinSqaresGeneratorController : ApiController
     {
+        private readonly string FILES_PATH = @"c:\plr\";
+
         [HttpGet]
         [Route("api/GetRectangle")]
         public HttpResponseMessage GetRectangle([FromUri] int rows = 5, [FromUri] int cols = 5, [FromUri] int symbols = 5, [FromUri] int count = 25)
@@ -122,9 +124,10 @@ namespace LatinSquares.Controllers
             string res = "";
             try
             {
-                string fileName = new Random().Next().ToString() + ".txt";
-                res = Utils.CommandLine.Execute(@"c:\plr_non_trivial.exe", howMany + " " + fileName);
+                string fileName = FILES_PATH + new Random().Next().ToString() + ".txt";
+                res = Utils.CommandLine.Execute(FILES_PATH + @"plr_non_trivial.exe", howMany + " " + fileName);
                 FileInfo file = new FileInfo(fileName);
+                if (!file.Exists) throw new Exception("non_trivial didnt write file");
                 while (Utils.IsFileLocked(file));
                 res = File.ReadAllText(fileName);
                 var rectStrings = res.Split(new string[] { "\n\n"}, StringSplitOptions.RemoveEmptyEntries);
@@ -148,7 +151,7 @@ namespace LatinSquares.Controllers
             catch (Exception e)
             {
                 res = "error: " + e.ToString();
-                File.WriteAllText(@"c:\log.txt", res);
+                File.WriteAllText(FILES_PATH + @"log.txt", res);
             }
 
             response.Content = new StringContent(result);
@@ -167,11 +170,11 @@ namespace LatinSquares.Controllers
             {
                 InvestigationObject obj = new InvestigationObject(squareString);
                 Random r = new Random();
-                string inputFileName = @"c:\" + r.Next().ToString() + "_in.txt";
+                string inputFileName = FILES_PATH + r.Next().ToString() + "_in.txt";
                 File.WriteAllText(inputFileName, obj.AsString("cleanSquare"));
 
-                string outputFileName = @"c:\" + r.Next().ToString() + "_out.txt";
-                res = Utils.CommandLine.Execute(@"c:\atp.exe", inputFileName + " " + outputFileName);
+                string outputFileName = FILES_PATH + r.Next().ToString() + "_out.txt";
+                res = Utils.CommandLine.Execute(FILES_PATH + @"atp.exe", inputFileName + " " + outputFileName);
                 FileInfo file = new FileInfo(outputFileName);
                 while (Utils.IsFileLocked(file));
                 res = File.ReadAllText(outputFileName);
@@ -181,7 +184,7 @@ namespace LatinSquares.Controllers
             catch (Exception e)
             {
                 res = "error: " + e.ToString();
-                File.WriteAllText(@"c:\log.txt", res);
+                File.WriteAllText(FILES_PATH + @"log.txt", res);
             }
 
             response.Content = new StringContent(res);
@@ -203,7 +206,7 @@ namespace LatinSquares.Controllers
             catch (Exception e)
             {
                 res = "error: " + e.ToString();
-                File.WriteAllText(@"c:\log.txt", res);
+                File.WriteAllText(FILES_PATH + @"log.txt", res);
             }
 
             response.Content = new StringContent(res);
