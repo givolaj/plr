@@ -17,11 +17,11 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("Home", "About", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Empty", "Index", "Home", new { area = "" }, null)</li>
+                    <li>@Html.ActionLink("Empty", "Empty", "Home", new { area = "" }, null)</li>
                     <li>@Html.ActionLink("Full", "Full", "Home", new { area = "" }, null)</li>
                     <li>@Html.ActionLink("Non Trivial", "NonTrivial", "Home", new { area = "" }, null)</li>
                     <li>@Html.ActionLink("Investigation", "Investigation", "Home", new { area = "" }, null)</li>
@@ -34,9 +34,9 @@
     </div>
     <div class="container body-content">
         @RenderBody()
-        <hr />
         <footer>
-            <p>&copy; @DateTime.Now.Year - Implemented by Eiran Danan</p>
+            <p style="display: inline; float: left; height: 100%; padding-top: 10px;">&copy; @DateTime.Now.Year - Implemented by Eiran Danan</p>
+            <img src="~/Content/ilovemath.jpg" style="height: 50px; width: auto; display: inline; float: right;"/>
         </footer>
     </div>
 

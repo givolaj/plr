@@ -13,7 +13,7 @@ namespace LatinSquares.Controllers
     {
         public ActionResult Index()
         {
-            ViewBag.Title = "Home Page";
+            ViewBag.Title = "Home";
             return View();
         }
 
@@ -23,9 +23,9 @@ namespace LatinSquares.Controllers
             return View();
         }
 
-        public ActionResult About()
+        public ActionResult Empty()
         {
-            ViewBag.Title = "About";
+            ViewBag.Title = "Empty Rectangles";
             return View();
         }
 

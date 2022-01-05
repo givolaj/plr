@@ -1,6 +1,10 @@
 ﻿body {
     padding-top: 50px;
     padding-bottom: 20px;
+    background-image: url('/Content/bg.jpg'); 
+    background-position: center;
+    background-size: 100%;
+    background-repeat: no-repeat;
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -44,3 +48,48 @@ pre, code {
     min-width: 250px;
 }
 
+.jumbotron {
+    background-image: linear-gradient(to right, #c6ffdd, #fbd786, #f7797d);
+    box-shadow: 2px 4px 8px rgba(0,0,0,0.2);
+}
+
+.navbar {
+    background-image: linear-gradient(to right, #434343 0%, black 100%);
+}
+
+.inline {
+    display: inline;
+}
+
+.text-div {
+    font-size: 20px;
+    background-color: #fff;
+    background-image: linear-gradient(180deg, #fff 0%, #fefefe 50%, #fcfcfc 90%);
+    padding: 20px;
+    margin: 10px 2px 20px 2px;
+    box-shadow: 5px 6px 10px -5px rgba(0,0,0,0.2);
+    border: 1px solid #cc555520;
+    border-radius: 10px;
+}
+
+p {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+footer {
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    background-color: #fff !important;
+    text-align: center;
+    padding: 10px 30px;
+    font-size: 20px;
+    font-weight: 700;
+    box-shadow: 5px 6px 5px 5px rgba(0,0,0,0.2);
+}
+
+.bottom-padding {
+    height: 200px;
+}
