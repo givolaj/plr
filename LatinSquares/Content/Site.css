@@ -49,13 +49,19 @@ pre, code {
 }
 
 .jumbotron {
+    text-align: center;
     background-image: linear-gradient(to right, #c6ffdd, #fbd786, #f7797d);
     box-shadow: 2px 4px 8px rgba(0,0,0,0.2);
+    text-shadow: 1px 1px 1px #f0f0f0;
 }
 
-.navbar {
-    background-image: linear-gradient(to right, #434343 0%, black 100%);
-}
+    .jumbotron p {
+        font-size: 26px;
+    }
+
+    .navbar {
+        background-image: linear-gradient(to right, #434343 0%, black 100%);
+    }
 
 .inline {
     display: inline;
