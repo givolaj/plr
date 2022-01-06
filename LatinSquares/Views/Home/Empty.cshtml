@@ -21,41 +21,36 @@
     <p>We take empty rectangles, and recursively add values according to parameters of request. works like a charm up to about 75% full rectangles.. for fuller rectangles, go to 'Full' page</p>
 </div>
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6 col-xs-12">
         <h2>Parameters</h2>
-        <label>Fill out parametes and click 'Generate'.</label>
+        <label>Fill out parametes and click 'Generate'.<br /> Minimum value for all fields is 2, Maximum is 36. Other values may behave unpredictably. <br />Number of symbols can't be smaller than rows and columns.</label>
         <hr />
 
-        <div class="form-group">
+        <div class="form-group" style="width: 100% !important;">
             <label for="rows">Rows</label>
-            <input class="form-control margin-bottom-10" type="number" id="rows" placeholder="rows" />
+            <input class="form-control margin-bottom-10" type="number" id="rows" placeholder="rows (2-36)" />
 
             <label for="cols">Columns</label>
-            <input class="form-control margin-bottom-10" type="number" id="cols" placeholder="columns" />
+            <input class="form-control margin-bottom-10" type="number" id="cols" placeholder="columns (2-36)" />
 
             <label for="symbols"> Number of Symbols in language</label>
-            <input class="form-control margin-bottom-10" type="number" id="symbols" placeholder="Number of Symbols in language" />
+            <input class="form-control margin-bottom-10" type="number" id="symbols" placeholder="Number of Symbols in language (2-36)" />
 
             <label for="count"> Number of symbols in matrix </label>
-            <input class="form-control margin-bottom-10" type="number" id="count" placeholder="Number of symbols in matrix" />
+            <input class="form-control margin-bottom-10" type="number" id="count" placeholder="Number of symbols in matrix (max: rows * cols)" />
 
             <br />
             <button class="btn btn-success" id="generate">Generate</button>
+            <button class="btn btn-primary" id="download">Download a file with rectangles</button>
             <p id="error"></p>
         </div>
 
     </div>
-    <div class="col-md-4">
+    <div class="col-md-6 col-xs-12">
         <h2>Results</h2>
-        <label>Results will show here. </label>
+        <label>Resulted PLR will show here. <br/> This might take a few seconds.. <br/> Downloaded file will not show here. </label>
         <hr />
         <div id="output"></div>
-    </div>
-    <div class="col-md-4">
-        <h2>Other options</h2>
-        <label>More options for data. </label>
-        <hr />
-        <button class="btn btn-primary" id="download">Download a file with rectangles</button>
     </div>
 </div>
 
