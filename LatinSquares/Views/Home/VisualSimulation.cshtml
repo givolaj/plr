@@ -18,7 +18,7 @@
 
     #initialSquareDiv {
         width: 100% !important;
-        margin-bottom: 10px;  
+        margin-bottom: 10px;
     }
 
     code {
@@ -27,6 +27,10 @@
 
     .margin-left-10 {
         margin-left: 10px;
+    }
+
+    .margin-top-10 {
+        margin-top: 10px;
     }
 
     #squareInput {
@@ -42,11 +46,10 @@
 </style>
 <div class="jumbotron">
     <h1>Visual Simulation</h1>
-    <p>See some cool stuff visually.</p>
+    <p>We draw the bipartite graph generated between two rows of a PLR, and it's subgraphs, as the first step of our new way of discovering if it's non trivial.</p>
 </div>
 <div class="row">
-
-    <div class="col-md-3">
+    <div class="col-md-12 col-xs-12">
         <h2>The rectangle</h2>
         <label>Click 'PLR' to generate a rectangle, 'Edit' to edit it, and 'Go' to start the investigation.</label>
         <hr />
@@ -57,18 +60,22 @@
         <button class="btn btn-info btn-lg pull-left margin-left-10" id="goBtn">Go</button>
     </div>
 
-    <div class="col-md-5 hidden" id="simulationRow">
+    <div class="col-md-6 col-xs-12 hidden margin-top-10" id="simulationRow">
         <h2>Graph</h2>
         <label>We're drawing a graph between two rows, drawing a solid line vertically and a dotted line diagonally where the numbers are equal.</label>
         <hr />
-        <canvas id="simulationCanvas" width="450" height="300" style="background-color: #f0f0f0; border:1px solid #a0a0a0;"></canvas>
+        <div style="overflow: scroll;">
+            <canvas id="simulationCanvas" width="450" height="300" style="background-color: #f0f0f0; border:1px solid #a0a0a0;"></canvas>
+        </div>
     </div>
 
-    <div class="col-md-4 hidden" id="subgrpahRow">
+    <div class="col-md-6 col-xs-12 hidden margin-top-10" id="subgrpahRow">
         <h2>Subgraphs</h2>
-        <label>Theses are all connected paths in the graphs, used to determine isomorphism, with their respected IDs.</label>  
+        <label>Theses are all connected paths in the graphs, used to determine isomorphism, with their respected IDs.</label>
         <hr />
-        <canvas id="subgraphsCanvas" width="300" height="300" style="background-color: #f0f0f0; border:1px solid #a0a0a0;"></canvas>
+        <div style="overflow: scroll;">
+            <canvas id="subgraphsCanvas" width="300" height="300" style="background-color: #f0f0f0; border:1px solid #a0a0a0;"></canvas>
+        </div>
     </div>
 </div>
 
@@ -108,7 +115,7 @@
                 let val = $("#squareInput").val();
                 let rows = val.split("]");
                 let newVal = "";
-                for(i=0;i<rows.length-1;i++){
+                for (i = 0; i < rows.length - 1; i++) {
                     let row = rows[i].replace("[", "").replace("]", "").replace("\n", "").replace("[", "");
                     let cols = row.split(" ");
                     newVal += "[";
@@ -141,7 +148,7 @@
                 let canvas = document.getElementById("simulationCanvas");
                 let ctx = canvas.getContext("2d");
                 let width = 360;
-                ctx.clearRect(0,0,600,300);
+                ctx.clearRect(0, 0, 600, 300);
                 ctx.font = "20px Roboto bold";
                 ctx.fillStyle = '#c55';
                 ctx.lineWidth = 3;
@@ -151,7 +158,7 @@
                     let row = $(this).attr('class').split(/\s+/)[1];
                     let col = $(this).attr('class').split(/\s+/)[2].split('-')[1];
                     let digit = $(this).text();
-                    if (digit.indexOf(".") >= 0) digit = "_";                 
+                    if (digit.indexOf(".") >= 0) digit = "_";
                     if (row == row1) {
                         let x = 60 + col * width / cols;
                         let y = 60;
@@ -235,7 +242,7 @@
                         if (this.bottom < minIndex)
                             minIndex = this.bottom;
                     });
-                    let colWidth = 10* width / (maxIndex + 1);
+                    let colWidth = 10 * width / (maxIndex + 1);
 
                     $.each(path, function () {
                         ctx.beginPath();
@@ -247,7 +254,7 @@
                         ctx.stroke();
                         ctx.closePath();
                     });
-     
+
                 });
 
                 getIdentifierFromPaths(paths);
@@ -285,7 +292,7 @@
 
             var row1 = undefined;
             var row2 = undefined;
-            $(document).on('click', '.matrix-cell', function () {               
+            $(document).on('click', '.matrix-cell', function () {
                 let row = $(this).attr('class').split(/\s+/)[1];
                 if (row1 == undefined) {
                     row1 = row;

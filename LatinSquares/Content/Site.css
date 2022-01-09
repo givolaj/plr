@@ -55,9 +55,10 @@ pre, code {
     display: table-cell;
     text-align:center;
     vertical-align:middle;
-    min-height: 350px;
-    min-width: 350px;
+    min-height: 300px;
+    min-width: 300px;
     font-size: 22px;
+    margin: auto;
 }
 
 .jumbotron {
@@ -133,4 +134,15 @@ h1 {
 
 input, select, textarea {
     max-width: 1200px;
+}
+
+.smallFont {
+    font-size: 11px !important;
+}
+
+@media (max-width: 479px) {
+    footer p {
+        margin-top: 5px;
+        font-size: 13px;
+    }
 }
