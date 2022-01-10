@@ -39,18 +39,19 @@
     <p>investigate a PLR, see if it's guilty.</p>
 </div>
 <div class="row">
-    <h2>The rectangle</h2>
-    <label>Click 'PLR' to generate a rectangle, 'Edit' to edit it, and 'Go' to start the investigation. Good luck!</label>
-    <hr />
-    <div id="initialSquareDiv"><pre>your PLR will appear here</pre></div>
-    <div><textarea rows="5" class="form-control hidden" id="squareInput"></textarea></div>
-    <button class="btn btn-primary btn-lg pull-left" id="randomSquareBtn">PLR</button>
-    <button class="btn btn-success btn-lg pull-left margin-left-10" id="editBtn">Edit</button>
-    <button class="btn btn-info btn-lg pull-left margin-left-10" id="goBtn">Go</button>
+    <div class="col-xs-12 col-md-12">
+        <h2>The rectangle</h2>
+        <label>Click 'PLR' to generate a rectangle, 'Edit' to edit it, and 'Go' to start the investigation. Good luck!</label>
+        <hr />
+        <div id="initialSquareDiv"><pre>your PLR will appear here</pre></div>
+        <div><textarea rows="5" class="form-control hidden" id="squareInput"></textarea></div>
+        <button class="btn btn-primary btn-lg pull-left" id="randomSquareBtn">PLR</button>
+        <button class="btn btn-success btn-lg pull-left margin-left-10" id="editBtn">Edit</button>
+        <button class="btn btn-info btn-lg pull-left margin-left-10" id="goBtn">Go</button>
+    </div>
 </div>
 <div class="row">
-    <div class="col-md-7">
-        
+    <div class="col-md-6 col-xs-12">
         <br />
         <br />
         <div class="hidden" id="tripletsRow">
@@ -71,7 +72,7 @@
             <button class="btn btn-success btn-lg" style="margin-top: 20px !important;" id="backN">back</button>
         </div>
     </div>
-    <div class="col-md-5">
+    <div class="col-md-6 col-xs-12">
         <div class="hidden" id="comparisonMatrix">
             <h2>Comparison Matrices</h2>
             <label>For each two rows, cols and symbols, we check for isomorphism, and display those isomorphisms in a matrix.<br /> </label>
@@ -80,10 +81,6 @@
             <button class="btn btn-primary btn-lg" style="margin-top: 20px !important;" id="refineG">refine partition</button>
         </div>
     </div>
-
-    
-
-   
 </div>
 
 @section scripts{
