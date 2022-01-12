@@ -7,6 +7,7 @@ using System.Web.Http;
 using LatinSquares.Models;
 using System.Net.Http.Headers;
 using System.IO;
+using System.Web.Http.Description;
 
 namespace LatinSquares.Controllers
 {
@@ -14,6 +15,14 @@ namespace LatinSquares.Controllers
     {
         private readonly string FILES_PATH = @"c:\plr\";
 
+        /// <summary>
+        /// Get Rectangles - Starting from empty matrices
+        /// </summary>
+        /// <param name="rows">number of rows in matrix</param>
+        /// <param name="cols">number of columns in matrix</param>
+        /// <param name="symbols">number of symbols in alphabet</param>
+        /// <param name="count">number of non-empty entries in rectangle</param>
+        /// <returns>a rectangle in the website format</returns>
         [HttpGet]
         [Route("api/GetRectangle")]
         public HttpResponseMessage GetRectangle([FromUri] int rows = 5, [FromUri] int cols = 5, [FromUri] int symbols = 5, [FromUri] int count = 25)
@@ -192,7 +201,7 @@ namespace LatinSquares.Controllers
             return response;
         }
 
-
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         [Route("api/CMDTest")]
         public HttpResponseMessage CMDTest()

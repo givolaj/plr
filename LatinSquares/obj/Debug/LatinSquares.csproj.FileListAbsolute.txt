@@ -186,3 +186,4 @@ C:\Users\givol\OneDrive\Documents\GitHub\plr\LatinSquares\obj\Debug\LatinSquares
 C:\Users\givol\OneDrive\Documents\GitHub\plr\LatinSquares\obj\Debug\LatinSquares.csproj.CopyComplete
 C:\Users\givol\OneDrive\Documents\GitHub\plr\LatinSquares\obj\Debug\LatinSquares.dll
 C:\Users\givol\OneDrive\Documents\GitHub\plr\LatinSquares\obj\Debug\LatinSquares.pdb
+C:\Users\givol\OneDrive\Documents\GitHub\plr\LatinSquares\bin\XmlDocument.xml
