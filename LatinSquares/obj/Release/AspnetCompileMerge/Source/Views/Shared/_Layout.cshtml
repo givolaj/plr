@@ -7,10 +7,17 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:300" rel="stylesheet">
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+    <style>
+        @@media (min-width: 480px) {
+            a.dropdown-item.active {
+                color: #525252 !important;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
+    <nav class="navbar navbar-inverse navbar-fixed-top" style="overflow: visible;">
+        <div class="container" style="overflow: visible;">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="icon-bar"></span>
@@ -19,11 +26,16 @@
                 </button>
                 @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Empty", "Empty", "Home", new { area = "" }, null)</li>
-                    <li>@Html.ActionLink("Full", "Full", "Home", new { area = "" }, null)</li>
-                    <li>@Html.ActionLink("Non Trivial", "NonTrivial", "Home", new { area = "" }, null)</li>
+            <div class="navbar-collapse collapse" style="overflow: visible;">
+                <ul class="nav navbar-nav" style="overflow: visible;">
+                    <li class="dropdown" style="overflow: visible;">
+                        <a class="dropdown-toggle" data-toggle="dropdown">Generate<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li role="menuitem">@Html.ActionLink("Empty", "Empty", "Home", new { area = "" }, new { @class = "dropdown-item" })</li>
+                            <li role="menuitem">@Html.ActionLink("Full", "Full", "Home", new { area = "" }, new { @class = "dropdown-item" })</li>
+                            <li>@Html.ActionLink("Non Trivial", "NonTrivial", "Home", new { area = "" }, new { @class = "dropdown-item" })</li>
+                        </ul>
+                    </li>
                     <li>@Html.ActionLink("Investigation", "Investigation", "Home", new { area = "" }, null)</li>
                     <li>@Html.ActionLink("Our Database", "DB", "Home", new { area = "" }, null)</li>
                     <li>@Html.ActionLink("Visual Simulation", "VisualSimulation", "Home", new { area = "" }, null)</li>
@@ -31,7 +43,7 @@
                 </ul>
             </div>
         </div>
-    </div>
+    </nav>
     <div class="container body-content">
         @RenderBody()
         <div class="bottom-padding">

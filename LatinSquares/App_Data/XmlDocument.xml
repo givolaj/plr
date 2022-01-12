@@ -491,5 +491,41 @@
             <param name="count">number of non-empty entries in rectangle</param>
             <returns>a rectangle in the website format</returns>
         </member>
+        <member name="M:LatinSquares.Controllers.LatinSqaresGeneratorController.GetRectangleFile(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Get Rectangles - Starting from empty matrices - in a plain text file
+            </summary>
+            <param name="rows">number of rows in matrix</param>
+            <param name="cols">number of columns in matrix</param>
+            <param name="symbols">number of symbols in alphabet</param>
+            <param name="count">number of non-empty entries in rectangle</param>
+            <param name="squares">number of rectangles in file</param>
+            <returns>returns a plain text file in the website format</returns>
+        </member>
+        <member name="M:LatinSquares.Controllers.LatinSqaresGeneratorController.GetFullRectangle(System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Get Rectangles - Starting from full matrices
+            </summary>
+        </member>
+        <member name="M:LatinSquares.Controllers.LatinSqaresGeneratorController.GetFullRectanglesFile(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Get Rectangles - Starting from full matrices - in a plain text file
+            </summary>
+        </member>
+        <member name="M:LatinSquares.Controllers.LatinSqaresGeneratorController.GetInvestigationObjectForRectangle(System.String)">
+            <summary>
+            Get The String Entry Invariant information of the given rectangle
+            </summary>
+        </member>
+        <member name="M:LatinSquares.Controllers.LatinSqaresGeneratorController.GetNonTrivialRectangles(System.String)">
+            <summary>
+            Get a non-trivial PLR
+            </summary>
+        </member>
+        <member name="M:LatinSquares.Controllers.LatinSqaresGeneratorController.GetRectangleFromDb(System.Int32,System.Int32,System.Int32,System.Int32,System.String,System.Int32)">
+            <summary>
+            Get rectangles from our database (faster for large files)
+            </summary>
+        </member>
     </members>
 </doc>

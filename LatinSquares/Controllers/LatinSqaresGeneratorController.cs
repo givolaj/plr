@@ -38,6 +38,15 @@ namespace LatinSquares.Controllers
             return response;
         }
 
+        /// <summary>
+        /// Get Rectangles - Starting from empty matrices - in a plain text file
+        /// </summary>
+        /// <param name="rows">number of rows in matrix</param>
+        /// <param name="cols">number of columns in matrix</param>
+        /// <param name="symbols">number of symbols in alphabet</param>
+        /// <param name="count">number of non-empty entries in rectangle</param>
+        /// <param name="squares">number of rectangles in file</param>
+        /// <returns>returns a plain text file in the website format</returns>
         [HttpGet]
         [Route("api/GetRectangleFile")]
         public HttpResponseMessage GetRectangleFile([FromUri] int rows = 5, [FromUri] int cols = 5, [FromUri] int symbols = 5, [FromUri] int count = 25, [FromUri] int squares = 10)
@@ -61,6 +70,9 @@ namespace LatinSquares.Controllers
             return response;
         }
 
+        /// <summary>
+        /// Get Rectangles - Starting from full matrices
+        /// </summary>
         [HttpGet]
         [Route("api/GetFullRectangle")]
         public HttpResponseMessage GetFullRectangle([FromUri] int rows = 5, [FromUri] int cols = 5, [FromUri] int count = 25, [FromUri] int symbols = 5)
@@ -77,7 +89,9 @@ namespace LatinSquares.Controllers
             return response;
         }
 
-
+        /// <summary>
+        /// Get Rectangles - Starting from full matrices - in a plain text file
+        /// </summary>
         [HttpGet]
         [Route("api/GetFullRectanglesFile")]
         public HttpResponseMessage GetFullRectanglesFile([FromUri] int rows = 5, [FromUri] int cols = 5, [FromUri] int symbols = 5, [FromUri] int count = 25, [FromUri] int squares = 10)
@@ -101,7 +115,9 @@ namespace LatinSquares.Controllers
             return response;
         }
 
-
+        /// <summary>
+        /// Get The String Entry Invariant information of the given rectangle
+        /// </summary>
         [HttpGet]
         [Route("api/GetInvestigationObjectForRectangle")]
         public HttpResponseMessage GetInvestigationObjectForRectangle([FromUri] string squareString)
@@ -123,7 +139,9 @@ namespace LatinSquares.Controllers
             return response;
         }
 
-
+        /// <summary>
+        /// Get a non-trivial PLR
+        /// </summary>
         [HttpGet]
         [Route("api/GetNonTrivialRectangles")]
         public HttpResponseMessage GetNonTrivialRectangles([FromUri] string howMany)
@@ -168,7 +186,7 @@ namespace LatinSquares.Controllers
             return response;
         }
 
-
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet]
         [Route("api/GetAtp")]
         public HttpResponseMessage GetAtp([FromUri] string squareString)
@@ -223,7 +241,9 @@ namespace LatinSquares.Controllers
             return response;
         }
 
-
+        /// <summary>
+        /// Get rectangles from our database (faster for large files)
+        /// </summary>
         [HttpGet]
         [Route("api/GetRectangleFromDb")]
         public HttpResponseMessage GetRectangleFromDb([FromUri] int rows = 5, [FromUri] int cols = 5, [FromUri] int count = 25, [FromUri] int symbols = 5, [FromUri] string type = "empty", [FromUri] int number = 1)
@@ -237,7 +257,7 @@ namespace LatinSquares.Controllers
             return response;
         }
 
-
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost]
         [Route("api/checkRectangles/{flag}")]
         public HttpResponseMessage CheckRectangles(bool flag, [FromBody] string input)
