@@ -37,8 +37,8 @@
                         </ul>
                     </li>
                     <li>@Html.ActionLink("Investigation", "Investigation", "Home", new { area = "" }, null)</li>
-                    <li>@Html.ActionLink("Our Database", "DB", "Home", new { area = "" }, null)</li>
                     <li>@Html.ActionLink("Visual Simulation", "VisualSimulation", "Home", new { area = "" }, null)</li>
+                    <li>@Html.ActionLink("Our Database", "DB", "Home", new { area = "" }, null)</li>
                     <li>@Html.ActionLink("API", "Index", "Help", new { area = "" }, null)</li>
                 </ul>
             </div>
@@ -60,6 +60,7 @@
     <script>
         $(document).ready(function () {
             let relativeUrl = $(location).attr('pathname');
+            if (relativeUrl.includes("Help")) relativeUrl = "/Help";
             $(".navbar a[href='" + relativeUrl + "']").addClass("active");
         });
     </script>

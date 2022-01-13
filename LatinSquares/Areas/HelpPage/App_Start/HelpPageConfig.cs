@@ -65,7 +65,7 @@ namespace LatinSquares.Areas.HelpPage
 
             //// Uncomment the following to use "1234" directly as the request sample for media type "text/plain" on the controller named "Values"
             //// and action named "Put".
-            //config.SetSampleRequest("1234", new MediaTypeHeaderValue("text/plain"), "Values", "Put");
+            config.SetSampleRequest("1234", new MediaTypeHeaderValue("text/plain"), "Values", "Put");
 
             //// Uncomment the following to use the image on "../images/aspNetHome.png" directly as the response sample for media type "image/png"
             //// on the controller named "Values" and action named "Get" with parameter "id".
