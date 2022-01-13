@@ -30,7 +30,11 @@
 </style>
 <div class="jumbotron">
     <h1>Non Trivial PLRs</h1>
-    <p>Create PLRs with a non trivial permutation that returns to the original PLR.<br/>Non trivial PLRs are rare, and as such can be used for cryptography.</p>
+    <p>
+        <img alt="sudoku" src="~/Content/bipartite.gif" class="inline" style="border-radius: 20px; height: 200px; width: auto; float: right; margin: 0px 0px 0px 20px;" />
+        Create PLRs with a non trivial permutation that returns to the original PLR.<br />Non trivial PLRs are rare, and as such can be used for cryptography.<br/>
+        We use the String Entry Invariant for sifting through rectangles until we find a non-trivial one.
+    </p>
 </div>
 <div class="row">
 
@@ -62,7 +66,7 @@
                     url: "/api/GetNonTrivialRectangles?howMany=1",
                     type: "get",
                     success: function (data) {
-                        $("#initialSquareDiv").html("<pre><code>" + data + "</code></pre>");
+                        $("#initialSquareDiv").html("<pre><code>" + data.replace(/\n/g, '') + "</code></pre>");
                     },
                     error: function (err) {
                         console.log(err);
