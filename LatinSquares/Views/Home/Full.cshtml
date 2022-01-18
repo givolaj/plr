@@ -42,6 +42,7 @@
 
             <label for="count"> Number of symbols in matrix </label>
             <input class="form-control margin-bottom-10" type="number" id="count" placeholder="Number of symbols in matrix (max: rows * cols)" />
+            <input class="margin-bottom-10" type="range" id="countPercent" min="0" max="100" value="0" />
 
             <br />
             <button class="btn btn-success" id="generate">Generate</button>
@@ -193,6 +194,18 @@
                     $("." + item).css("font-weight", "bold");
                     $("." + item).css("color", "#c55");
                 });
+            });
+
+            $("#countPercent").change(function () {
+                let rows = $("#rows").val();
+                let cols = $("#cols").val();
+                if (isNaN(rows) || isNaN(cols)) {
+                    return;
+                }
+                let size = Number(rows) * Number(cols);
+                let val = Number($(this).val());
+                let count = size * (val / 100);
+                $("#count").val(parseInt(count));
             });
         });
     </script>
