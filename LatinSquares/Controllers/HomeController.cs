@@ -80,5 +80,11 @@ namespace LatinSquares.Controllers
             return View();
         }
 
+        public ActionResult Documentation()
+        {
+            ViewBag.Title = "Documentation";
+            return View();
+        }
+
     }
 }

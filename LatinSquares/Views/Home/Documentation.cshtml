@@ -1,0 +1,195 @@
+﻿
+@{
+    ViewBag.Title = "Documentation";
+}
+
+<style>
+    pre, code {
+        width: 100%;
+        min-height: 50px !important;
+        height: auto;
+        display: table;
+        font-size: 18px;
+    }
+
+    code {
+        text-align: left;
+    }
+
+        code b {
+            color: #4477cc;
+        }
+</style>
+<div class="jumbotron">
+    <h1>Documentation</h1>
+    <p>
+        all of our theories and algorithms, explained.
+        our code samples are written in C#.
+    </p>
+</div>
+
+<div id="empty" class="text-div">
+    <h1>'empty'</h1>
+    <p>the 'generate from scratch' approach, in this website refered to as 'empty' rectangles.<br/>in lament terms, we take an empty rectangle in the given dimentions and fill it with symbols, checking it's validity at every step.</p>
+    <hr />
+    <h2>pseudo code:</h2>
+    <pre>
+    <code>
+<b>sq</b>      - our rectangle
+<b>h</b>       - how many entries more we need to insert
+1. if <b>h</b> = 0, you're done
+2. <b>if</b> can set any symbol at any index, do it, set <b>h</b> <= <b>h</b> - 1 and return to step 1
+<b>else</b> set <b>h</b> <= 0, return to step 1
+        </code>
+</pre>
+    <h2>actual code:</h2>
+    <pre>
+        <code>
+public static bool FillRectangle(Rectangle sq, Random r, int symbols, int howManyFullSlots)
+{
+    if (howManyFullSlots == 0) return true;
+
+    int symbolIndex = r.Next(symbols);
+    int row, col;
+    GetRandomIndex(r, sq.GetRowsNumber(), sq.GetColumnsNumber(), out row, out col);
+    int initialRow = row,
+        initialCol = col;
+    do
+    {
+        int _symbols = symbols;
+        while (!sq.CanSetValue(SYMBOLS[(symbolIndex + _symbols) % symbols], row, col) && _symbols-- > 0);
+        if (_symbols < 0)
+        {
+            sq.NextIndex(row, col, out row, out col);
+            if (col == -1) return false;
+        }
+        else
+        {
+            sq.Set(SYMBOLS[(symbolIndex + _symbols) % symbols], row, col);
+            bool success = FillRectangle(sq, r, symbols, howManyFullSlots - 1);
+            if (success)
+                return true;
+            else
+            {
+                sq.Set(Rectangle.EMPTY, row, col);
+                symbolIndex = r.Next(symbols);
+                GetRandomIndex(r, sq.GetRowsNumber(), sq.GetColumnsNumber(), out row, out col);
+                initialRow = row;
+                initialCol = col;
+                sq.NextIndex(row, col, out row, out col);
+            }
+        }
+    } while (col != initialCol || row != initialRow);
+    return false;
+}    
+        </code>
+    </pre>
+
+</div>
+
+<div id="full" class="text-div">
+    <h1>'full'</h1>
+    <p>the 'omit entries from a full rectangle' approach, in this website refered to as 'full' rectangles.
+    <br />in lament terms, we take a n X n matrix, where n is it's largest dimention, and fill it with symbols using the <a href="http://sedici.unlp.edu.ar/bitstream/handle/10915/42155/Documento_completo.pdf?sequence=1" target="_blank">Jacobson Metthews algorithm</a>. then we "cut" it to the right dimentions, and omit entries as needed.</p>
+    <hr />
+    <h2>pseudo code:</h2>
+    <pre>
+        <code>
+<b>sq</b>      - our rectangle
+<b>h</b>       - how many entries more we need to insert
+1. while <b>sq</b> has empty enrties, run a Jacobson Metthews step
+2. cut the square to the requested rectangle dimentions
+3. omit entries as much as needed
+        </code>
+</pre>
+    <h2>actual code:</h2>
+    <pre>
+        <code>
+void JacobsonMatthewsRandomStep()
+{
+    int x, y, z;
+    int n = values.GetUpperBound(0) + 1;
+    if (isProper)
+    {
+        x = rnd.Next() % n;
+        y = rnd.Next() % n;
+        z = rnd.Next() % n;
+        while (values[x,y,z] != 0)
+        {
+            x = rnd.Next() % n;
+            y = rnd.Next() % n;
+            z = rnd.Next() % n;
+        }
+    }
+    else
+    {
+        x = improper_x;
+        y = improper_y;
+        z = improper_z;
+    }
+
+    int[] x_ones = new int[n],
+            y_ones = new int[n],
+            z_ones = new int[n];
+    int x_nr_ones = 0, y_nr_ones = 0, z_nr_ones = 0;
+
+    for (int i = 0; i < n; i++)
+    {
+        if (values[i,y,z] == 1)
+        {
+            x_ones[x_nr_ones] = i;
+            x_nr_ones++;
+        }
+        if (values[x,i,z] == 1)
+        {
+            y_ones[y_nr_ones] = i;
+            y_nr_ones++;
+        }
+        if (values[x,y,i] == 1)
+        {
+            z_ones[z_nr_ones] = i;
+            z_nr_ones++;
+        }
+    }
+
+    int a = x_ones[rnd.Next() % x_nr_ones], b = y_ones[rnd.Next() % y_nr_ones], c = z_ones[rnd.Next() % z_nr_ones];
+
+    values[x,y,z]++;
+    values[x,b,c]++;
+    values[a,y,c]++;
+    values[a,b,z]++;
+    values[a,y,z]--;
+    values[x,b,z]--;
+    values[x,y,c]--;
+    values[a,b,c]--;
+
+    if (values[a,b,c] == 0) isProper = true;
+    else
+    {
+        isProper = false;
+        improper_x = a;
+        improper_y = b;
+        improper_z = c;
+    }
+}
+        </code>
+</pre>
+    <br/>
+    <pre>
+<code>
+public static Rectangle GetFullRectangle(int rows, int cols, int symbols, int count)
+{
+    int dim = rows > cols ? rows : cols;
+    dim = dim > symbols ? dim : symbols;
+    Cube c = new Cube(dim);
+    c.initAsUnitCube();
+    c.runJacobsonMatthewsSteps(1000);
+    Rectangle sq = c.toRectangle(rows, cols);
+    sq.RemoveValuesToMatchCount(count);
+    return sq;
+}
+</code>
+    </pre>
+
+</div>
+

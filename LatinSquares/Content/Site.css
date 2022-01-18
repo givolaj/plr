@@ -1,8 +1,8 @@
 ﻿body {
     padding-top: 50px;
     padding-bottom: 20px;
-    background-image: url('/Content/bg.jpg');
-    background-position: top;
+    background-image: url('/Content/bg-old.jpg');
+    background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
@@ -31,8 +31,16 @@ textarea {
     max-width: 280px;
 }
 
-.navbar, h1, h2, h3, h4, h5, h6, p, label, input {
+.btn, .btn:visited, .btn active {
+    outline: none !important;
+}
+
+.navbar, h1, h2, h3, h4, h5, h6, p, label, input, div, label {
     font-family: 'Roboto', sans-serif !important;
+}
+
+code {
+    font-family: monospace !important;
 }
 
 .navbar {
@@ -45,6 +53,7 @@ textarea {
 .navbar a {
     font-size: 20px;
     color: #f0f0f0;
+    text-shadow: 0px 0px 0px #c55;
 }
 
 .body-content {
@@ -53,8 +62,8 @@ textarea {
 
 pre, code {
     display: table-cell;
-    text-align:center;
-    vertical-align:middle;
+    text-align: left;
+    vertical-align: top;
     min-height: 300px;
     min-width: 300px;
     font-size: 22px;
@@ -73,7 +82,8 @@ pre, code {
     }
 
     .navbar {
-        background-image: linear-gradient(to right, #434343 0%, black 100%);
+        background-image: linear-gradient(to right, #343434 0%, #434343 100%);
+        border-bottom: 1px solid rgba(210, 80, 80, 0.3);
     }
 
 .inline {
@@ -100,6 +110,8 @@ pre, code {
             font-weight: 700;
             text-decoration: none;
         }
+
+
 
 p {
     overflow-wrap: break-word;
@@ -138,6 +150,12 @@ input, select, textarea {
 
 .smallFont {
     font-size: 11px !important;
+}
+
+.jumbotron h1 a i {
+    overflow: visible;
+    color: #525252;
+    font-size: 20px;
 }
 
 @media (max-width: 479px) {
