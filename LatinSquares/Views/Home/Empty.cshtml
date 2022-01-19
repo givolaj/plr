@@ -41,9 +41,15 @@
             <label for="symbols">Number of Symbols in language</label>
             <input class="form-control margin-bottom-10" type="number" id="symbols" placeholder="Number of Symbols in language (2-36)" />
 
-            <label for="count">Number of non-empty entries in matrix </label>
+            <label for="count">Number of non empty entries</label>
             <input class="form-control margin-bottom-10" type="number" id="count" placeholder="Number of symbols in matrix (max: rows * cols)" />
-            <input class="margin-bottom-10" type="range" id="countPercent" min="0" max="100" value="0" />
+
+            <label for="countPercent">Percent of non empty entries</label>
+            <div>
+                <input class="margin-bottom-10" type="range" id="countPercent" min="0" max="100" value="0" />
+                <p style="text-align: center; width: 100%;" id="countPercentText">0%</p>
+            </div>
+
             <br />
             <button class="btn btn-success" id="generate">Generate</button>
             <button class="btn btn-primary" id="download">Download a file with rectangles</button>
@@ -61,7 +67,6 @@
 
 <div id="downloadInputModal" class="modal fade" role="dialog">
     <div class="modal-dialog">
-
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -99,12 +104,15 @@
                 if (symbols == "") $("#symbols").addClass("error");
                 else $("#symbols").removeClass("error");
 
-                if (count == "") count = Number(rows) * Number(cols);
+                if (count == "") $("#count").addClass("error");
+                else $("#count").removeClass("error");
 
-                if (rows == "" ||
-                    cols == "" ||
-                    symbols == "" ||
-                    Number(rows) > Number(symbols) ||
+                if (rows == "" || cols == "" || symbols == "" || count == "") {
+                    $("#error").html("please fill in all the parameters");
+                    return;
+                }
+
+                if (Number(rows) > Number(symbols) ||
                     Number(cols) > Number(symbols)) {
                     $("#rows").addClass("error");
                     $("#symbols").addClass("error");
@@ -118,7 +126,7 @@
                     return;
                 }
 
-                $("#count").removeClass("error");
+                $("#error").html('');
 
                 $.ajax({
                     url: "/api/GetRectangle?rows=" + rows + "&cols=" + cols + "&symbols=" + symbols + "&count=" + count,
@@ -147,8 +155,29 @@
                 if (symbols == "") $("#symbols").addClass("error");
                 else $("#symbols").removeClass("error");
 
-                if (rows == "" || cols == "" || symbols == "") return;
+                if (count == "") $("#count").addClass("error");
+                else $("#count").removeClass("error");
 
+                if (rows == "" || cols == "" || symbols == "" || count == "") {
+                    $("#error").html("please fill in all the parameters");
+                    return;
+                }
+
+                if (Number(rows) > Number(symbols) ||
+                    Number(cols) > Number(symbols)) {
+                    $("#rows").addClass("error");
+                    $("#symbols").addClass("error");
+                    $("#error").html("can't have more rows and columns than symbols");
+                    return;
+                }
+
+                if (Number(count) > Number(rows) * Number(cols)) {
+                    $("#count").addClass("error");
+                    $("#error").html("come on buddy..");
+                    return;
+                }
+
+                $("#error").html('');
                 $("#downloadInputModal").modal('show');
             });
 
@@ -197,15 +226,27 @@
             });
 
             $("#countPercent").change(function () {
+                $("#countPercentText").text($(this).val() + "%");
                 let rows = $("#rows").val();
                 let cols = $("#cols").val();
-                if (isNaN(rows) || isNaN(cols)) {
+                if (isNaN(rows) || isNaN(cols) || !rows || !cols) {
                     return;
-                } 
+                }
                 let size = Number(rows) * Number(cols);
                 let val = Number($(this).val());
                 let count = size * (val / 100);
                 $("#count").val(parseInt(count));
+            });
+
+            $("#count").change(function () {
+                let rows = $("#rows").val();
+                let cols = $("#cols").val();
+                if (isNaN(rows) || isNaN(cols) || !rows || !cols) {
+                    return;
+                }
+                let size = Number(rows) * Number(cols);
+                let val = Number($(this).val());
+                $("#countPercent").val(parseInt(val / size * 100)).change();
             });
         });
     </script>
