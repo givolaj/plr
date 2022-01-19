@@ -33,6 +33,13 @@
         margin-bottom: 10px;
     }
 
+        #tripletsDiv div:first-child code {
+            font-size: 12px !important;
+            white-space: nowrap;
+            overflow-x: scroll;
+            text-align: left;
+        }
+
 </style>
 <div class="jumbotron">
     <h1>PLR Investigation</h1>
@@ -139,7 +146,6 @@
                     type: "get",
                     success: function (data) {
                         investigationObj = JSON.parse(data);
-                        console.log(investigationObj);
                         drawPartitionsN();
                         drawPartitionsG();
                     },

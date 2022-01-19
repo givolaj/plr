@@ -114,21 +114,22 @@
 
 .help-page h2,
 .help-page .h2 {
-    font-size: 24px;
+    font-size: 26px;
 }
 
 .help-page h3,
 .help-page .h3 {
-    font-size: 20px;
+    font-size: 22px;
 }
 
 #body.help-page {
-    font-size: 14px;
-    line-height: 143%;
-    color: #333;
+    font-size: 20px;
+    line-height: 150%;
+    color: #525252;
 }
 
-.help-page a {
-    color: #0000EE;
+
+.help-page a, help-page a:hover, .help-page a:active, .help-page a:visited {
+    color: #525252;
     text-decoration: none;
 }

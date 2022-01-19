@@ -16,13 +16,15 @@
     }
 </style>
 <div class="jumbotron">
-    <h1>Full PLRs</h1>
-    <p>
+    <h1>
+        Full PLRs <a href="/home/documentation/#full"><i class="glyphicon glyphicon-question-sign"></i></a>
         <img alt="sudoku" src="~/Content/full.gif" class="inline" style="border-radius: 20px; height: 200px; width: auto; float: right; margin: 0px 0px 0px 20px;" />
+    </h1>
+    <p>
         We take full latin rectangles generated randomly with the Jacobson-Matthews algorithm, and remove values at random locations, to generate the matrices on this page
     </p>
 </div>
-<div class="row">
+<div class="row text-div">
     <div class="col-md-6 col-xs-12">
         <h2>Parameters</h2>
         <label>Fill out parametes and click 'Generate'.<br /> Minimum value for all fields is 2, Maximum is 36. Other values may behave unpredictably. <br />Number of symbols can't be smaller than rows and columns.</label>
@@ -35,11 +37,17 @@
             <label for="cols">Columns</label>
             <input class="form-control margin-bottom-10" type="number" id="cols" placeholder="columns (2-36)" />
 
-            <label for="symbols"> Number of Symbols in language</label>
+            <label for="symbols">Number of Symbols in language</label>
             <input class="form-control margin-bottom-10" type="number" id="symbols" placeholder="Number of Symbols in language (2-36)" />
 
-            <label for="count"> Number of symbols in matrix </label>
+            <label for="count">Number of non empty entries</label>
             <input class="form-control margin-bottom-10" type="number" id="count" placeholder="Number of symbols in matrix (max: rows * cols)" />
+
+            <label for="countPercent">Percent of non empty entries</label>
+            <div>
+                <input class="margin-bottom-10" type="range" id="countPercent" min="0" max="100" value="0" />
+                <p style="text-align: center; width: 100%;" id="countPercentText">0%</p>
+            </div>
 
             <br />
             <button class="btn btn-success" id="generate">Generate</button>
@@ -96,12 +104,15 @@
                 if (symbols == "") $("#symbols").addClass("error");
                 else $("#symbols").removeClass("error");
 
-                if (count == "") count = Number(rows) * Number(cols);
+                if (count == "") $("#count").addClass("error");
+                else $("#count").removeClass("error");
 
-                if (rows == "" ||
-                    cols == "" ||
-                    symbols == "" ||
-                    Number(rows) > Number(symbols) ||
+                if (rows == "" || cols == "" || symbols == "" || count == "") {
+                    $("#error").html("please fill in all the parameters");
+                    return;
+                }
+
+                if (Number(rows) > Number(symbols) ||
                     Number(cols) > Number(symbols)) {
                     $("#rows").addClass("error");
                     $("#symbols").addClass("error");
@@ -115,9 +126,8 @@
                     return;
                 }
 
-                $("#count").removeClass("error");
+                $("#error").html('');
 
-                $("#error").html();
                 $.ajax({
                     url: "/api/GetFullRectangle?rows=" + rows + "&cols=" + cols + "&symbols=" + symbols + "&count=" + count,
                     type: "get",
@@ -134,6 +144,7 @@
                 let rows = $("#rows").val();
                 let cols = $("#cols").val();
                 let symbols = $("#symbols").val();
+                let count = $("#count").val();
 
                 if (rows == "") $("#rows").addClass("error");
                 else $("#rows").removeClass("error");
@@ -143,9 +154,30 @@
 
                 if (symbols == "") $("#symbols").addClass("error");
                 else $("#symbols").removeClass("error");
-  
-                if (rows == "" || cols == "" || symbols == "") return;
 
+                if (count == "") $("#count").addClass("error");
+                else $("#count").removeClass("error");
+
+                if (rows == "" || cols == "" || symbols == "" || count == "") {
+                    $("#error").html("please fill in all the parameters");
+                    return;
+                }
+
+                if (Number(rows) > Number(symbols) ||
+                    Number(cols) > Number(symbols)) {
+                    $("#rows").addClass("error");
+                    $("#symbols").addClass("error");
+                    $("#error").html("can't have more rows and columns than symbols");
+                    return;
+                }
+
+                if (Number(count) > Number(rows) * Number(cols)) {
+                    $("#count").addClass("error");
+                    $("#error").html("come on buddy..");
+                    return;
+                }
+
+                $("#error").html('');
                 $("#downloadInputModal").modal('show');
             });
 
@@ -164,7 +196,6 @@
                 let cols = $("#cols").val();
                 let symbols = $("#symbols").val();
                 let count = $("#count").val();
-                if (count == "") count = Number(rows) * Number(cols);
 
                 $.ajax({
                     url: "/api/GetFullRectanglesFile?rows=" + rows + "&cols=" + cols + "&symbols=" + symbols + "&count=" + count + "&squares=" + squares,
@@ -191,6 +222,30 @@
                     $("." + item).css("font-weight", "bold");
                     $("." + item).css("color", "#c55");
                 });
+            });
+
+            $("#countPercent").change(function () {
+                $("#countPercentText").text($(this).val() + "%");
+                let rows = $("#rows").val();
+                let cols = $("#cols").val();
+                if (isNaN(rows) || isNaN(cols) || !rows || !cols) {
+                    return;
+                } 
+                let size = Number(rows) * Number(cols);
+                let val = Number($(this).val());
+                let count = size * (val / 100);
+                $("#count").val(parseInt(count));
+            });
+
+            $("#count").change(function () {
+                let rows = $("#rows").val();
+                let cols = $("#cols").val();
+                if (isNaN(rows) || isNaN(cols) || !rows || !cols) {
+                    return;
+                } 
+                let size = Number(rows) * Number(cols);
+                let val = Number($(this).val());
+                $("#countPercent").val(parseInt(val / size * 100)).change();
             });
         });
     </script>
