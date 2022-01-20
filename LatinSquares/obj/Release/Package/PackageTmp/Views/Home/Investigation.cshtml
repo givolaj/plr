@@ -20,12 +20,15 @@
         width: 100% !important;
         margin-bottom: 10px;
     }
-    .margin-left-10{
+
+    .margin-left-10 {
         margin-left: 10px;
     }
+
     #squareInput {
         margin-bottom: 10px;
     }
+
     #tripletsDiv {
         width: 100% !important;
         min-height: 250px;
@@ -34,19 +37,18 @@
     }
 
         #tripletsDiv div:first-child code {
-            font-size: 12px !important;
+            font-size: 14px !important;
             white-space: nowrap;
             overflow-x: scroll;
             text-align: left;
         }
-
 </style>
 <div class="jumbotron">
     <h1>PLR Investigation</h1>
     <p>investigate a PLR, see if it's guilty.</p>
 </div>
-<div class="row">
-    <div class="col-xs-12 col-md-12">
+<div class="row text-div">
+    <div class="col-xs-12 col-md-12 ">
         <h2>The rectangle</h2>
         <label>Click 'PLR' to generate a rectangle, 'Edit' to edit it, and 'Go' to start the investigation. Good luck!</label>
         <hr />
@@ -57,8 +59,8 @@
         <button class="btn btn-info btn-lg pull-left margin-left-10" id="goBtn">Go</button>
     </div>
 </div>
-<div class="row">
-    <div class="col-md-6 col-xs-12">
+<div class="row text-div">
+    <div class="col-md-12 col-xs-12">
         <br />
         <br />
         <div class="hidden" id="tripletsRow">
@@ -79,7 +81,8 @@
             <button class="btn btn-success btn-lg" style="margin-top: 20px !important;" id="backN">back</button>
         </div>
     </div>
-    <div class="col-md-6 col-xs-12">
+    <div class="col-md-12 col-xs-12" style="height: 50px;"></div>
+    <div class="col-md-12 col-xs-12">
         <div class="hidden" id="comparisonMatrix">
             <h2>Comparison Matrices</h2>
             <label>For each two rows, cols and symbols, we check for isomorphism, and display those isomorphisms in a matrix.<br /> </label>
@@ -153,18 +156,18 @@
                         console.log(err);
                     }
                 });
-                
-               /* $.ajax({
-                    url: "/api/GetAtp?&squareString=" + squareString,
-                    type: "get",
-                    success: function (data) {
-                        console.log(data);
-                        $("#ERDiv").html("<pre><code>" + data.replaceAll(";", "<br/>") + "</code></pre>");
-                    },
-                    error: function (err) {
-                        console.log(err);
-                    }
-                });*/
+
+                /* $.ajax({
+                     url: "/api/GetAtp?&squareString=" + squareString,
+                     type: "get",
+                     success: function (data) {
+                         console.log(data);
+                         $("#ERDiv").html("<pre><code>" + data.replaceAll(";", "<br/>") + "</code></pre>");
+                     },
+                     error: function (err) {
+                         console.log(err);
+                     }
+                 });*/
 
             });
 
@@ -172,7 +175,7 @@
             $("#tripletsIncreaseFontSize").click(function () {
                 var fontSize = parseInt($("#tripletsDiv").find("code").css("font-size"));
                 fontSize = fontSize + 1 + "px";
-                $("#tripletsDiv").find("code").css({'font-size':fontSize});
+                $("#tripletsDiv").find("code").css({ 'font-size': fontSize });
             });
 
             $("#tripletsDecreaseFontSize").click(function () {
@@ -187,7 +190,7 @@
                 }
                 return -1;
             }
-         
+
             $("#refineN").click(function () {
                 if (partitionsNIndex < investigationObj.partitionsN.length - 1)
                     partitionsNIndex++;
@@ -199,7 +202,14 @@
                     partitionsNIndex--;
                 drawPartitionsN();
             });
-            
+
+            let r = getUrlParameter("r");
+            if (r) {
+                r = Base64.decode(r);
+                $("#initialSquareDiv").html(r);
+                $("#goBtn").click();
+            }
+
         });
     </script>
 }

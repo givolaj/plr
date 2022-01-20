@@ -63,6 +63,25 @@
             let relativeUrl = $(location).attr('pathname');
             if (relativeUrl.includes("Help")) relativeUrl = "/Help";
             $(".navbar a[href='" + relativeUrl + "']").addClass("active");
+
+            $(document).on('change', 'input', function () {
+                let id = $(this).attr('id');
+                if (id) {
+                    localStorage[id] = $(this).val();
+                }
+            });
+
+            setTimeout(function () {
+                $.each($("input"), function () {
+                    let id = $(this).attr('id');
+                    if (id) {
+                        let val = localStorage[id];
+                        if (val) {
+                            $(this).val(val).change();
+                        }
+                    }
+                });
+            }, 300);
         });
     </script>
 
