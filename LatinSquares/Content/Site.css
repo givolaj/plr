@@ -50,6 +50,10 @@ code {
     border-radius: 0px 0px 30% 30%;
 }
 
+.form-group > label, .form-group > input, button {
+    font-size: 18px !important;
+}
+
 .navbar a {
     font-size: 22px;
     color: #f0f0f0;
@@ -66,9 +70,14 @@ pre, code {
     vertical-align: top;
     min-height: 300px;
     min-width: 300px;
-    width: 100%;
     font-size: 22px;
     margin: auto;
+    max-width: 10000px;
+    width: 100% !important;
+}
+
+.margin-top-10 {
+    margin-top: 10px;
 }
 
 .jumbotron {

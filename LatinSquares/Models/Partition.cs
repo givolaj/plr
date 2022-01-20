@@ -21,13 +21,16 @@ namespace LatinSquares.Models
                 string[] items = parts[i].Replace("{", "").Replace("}", "").Split(',');
                 foreach (var it in items)
                 {
-                    p.Add(Array.IndexOf(Utils.SYMBOLS, it.Trim()));
+                    var index = Array.IndexOf(Utils.SYMBOLS, it.Trim());
+                    if (index == -1)
+                        p.Add(it.AsInt());
+                    else p.Add(index);
                 }
                 Groups.Add(i + 1, p);
             }
         }
 
-        public string AsString(bool useSymbols = false)
+        public string AsString()
         {
             string rowsString = "[";
             foreach (var p in Groups)
@@ -35,7 +38,7 @@ namespace LatinSquares.Models
                 rowsString += "{";
                 foreach (int n in p.Value)
                 {
-                    rowsString += (useSymbols ? Utils.SYMBOLS[n] : (n + 1) + "") + ",";
+                    rowsString += (n + 1) + ",";
                 }
                 rowsString = rowsString.Substring(0, rowsString.Length - 1) + "},";
             }

@@ -44,7 +44,7 @@
         <label>Click 'random PLR' to generate a non trivial PLR.</label>
         <hr />
         <div id="initialSquareDiv"><pre>your PLR will appear here</pre></div>
-        <button class="btn btn-primary btn-lg pull-left" id="randomSquareBtn">Random PLR</button>
+        <button class="btn btn-primary pull-left" id="randomSquareBtn">Random PLR</button>
     </div>
 
     <div class="col-md-6 col-xs-12">
@@ -61,13 +61,16 @@
 
 @section scripts{
     <script>
+        var sendButton = "<button class='btn btn-danger pull-left margin-top-10' id='investigate'>Investigate</button>", recData;
+
         $(document).ready(function () {  
             $("#randomSquareBtn").click(function () {
                 $.ajax({
                     url: "/api/GetNonTrivialRectangles?howMany=1",
                     type: "get",
                     success: function (data) {
-                        $("#initialSquareDiv").html("<pre><code>" + data.replace(/\n/g, '') + "</code></pre>");
+                        recData = "<pre><code>" + data.replace(/\n/g, '') + "</code></pre>";
+                        $("#initialSquareDiv").html(recData + sendButton);
                     },
                     error: function (err) {
                         console.log(err);
@@ -95,6 +98,10 @@
                         $("#downloadProgress").text("we encountered an error:( look at the log for details.");
                     }
                 });
+            });
+
+            $(document).on('click', '#investigate', function () {
+                location.href = "/home/investigation?r=" + Base64.encode(recData);
             });
         });
     </script>

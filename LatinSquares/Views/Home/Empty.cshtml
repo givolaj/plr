@@ -7,10 +7,6 @@
         border: 1px solid red;
     }
 
-    .form-group > label {
-        font-size: 14px !important;
-    }
-
     #error {
         color: #bb5588;
         margin-top: 10px;
@@ -88,6 +84,8 @@
 
 @section scripts{
     <script>
+        var sendButton = "<button class='btn btn-danger margin-top-10' id='investigate'>Investigate</button>", recData;
+
         $(document).ready(function () {
             $("#generate").click(function () {
                 let rows = $("#rows").val();
@@ -132,7 +130,8 @@
                     url: "/api/GetRectangle?rows=" + rows + "&cols=" + cols + "&symbols=" + symbols + "&count=" + count,
                     type: "get",
                     success: function (data) {
-                        $("#output").html(data);
+                        recData = data;
+                        $("#output").html(data + sendButton);
                     },
                     error: function (err) {
                         console.log(err);
@@ -203,8 +202,6 @@
                     type: "get",
                     success: function (data) {
                         $("#workingLabel").html('done!');
-                        //$("#closeModal").click();
-                        console.log(data);
                         download(data, "rectangles", "txt");
                     },
                     error: function (err) {
@@ -247,6 +244,10 @@
                 let size = Number(rows) * Number(cols);
                 let val = Number($(this).val());
                 $("#countPercent").val(parseInt(val / size * 100)).change();
+            });
+
+            $(document).on('click', '#investigate', function () {
+                location.href = "/home/investigation?r=" + Base64.encode(recData);
             });
         });
     </script>

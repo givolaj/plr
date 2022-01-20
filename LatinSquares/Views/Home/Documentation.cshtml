@@ -197,19 +197,20 @@ public static Rectangle GetFullRectangle(int rows, int cols, int symbols, int co
     <h1>'non-trivial'</h1>
     <p>
         We say a PLR is non trivial when it has a permutation (r,c,s) on it's rows, columns and symbols (swap), such that the PLR after the permutation is the same as the original PLR.<br />
+        In order to explain how we do that, we need to explain a few things first: <br /><br />
+        <b> Strong Entry Invariant (SEI)</b><hr />
+        This invariant is a triplet (a,b,c) attached to each entry, where a is the number of non-empty entries in that row, and b and c are the same for columns and symbols respectivaly.
+        in the investigation page we can see clear examples of Strong Entry Invariant.
+        <br /><br />
+        <b> Partitions</b><hr />
+        Taking the matrix we got from the Strong Entry Invariant, we can set all rows, columns and symbols in partitions according to the invariant.
+        for example, if in rows 1 and 3 we'll have the same values from the Invariant, say (3,2,4) - - (2,3,4), order unimportant, we say those two lines are in the same partition and mark them {1,3}.
+        <br />
+        The partitioning can happen again, as we can create a matrix from that partition and use SEI again.
+        this process is called refining.
+        <br /><br />
+        <b> So how do we do it?</b><hr />
+        So, in order to get a non-trivial rectangle, we go from the last stage backwords, meaning we take a non refineable partition and create a rectangle around it.
     </p>
-    @*<hr />
-    <h2>pseudo code:</h2>
-    <pre>
-    <code>
-
-        </code>
-</pre>
-    <h2>actual code:</h2>
-    <pre>
-    <code>
-
-        </code>
-</pre>*@
 </div>
 

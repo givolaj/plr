@@ -50,7 +50,7 @@ namespace LatinSquares.Models
                 GetPartitionsForRows(
                 GetTriplietsFromSquare(new Cube(square).
                 GetCubeWithSymbolsAsRowsTranspose().toRectangle(square.SymbolCount(),
-                square.GetColumnsNumber())), true)
+                square.GetColumnsNumber())))
                 ));
 
             do {
@@ -64,7 +64,7 @@ namespace LatinSquares.Models
                 GetPartitionsForRows(
                 GetTriplietsFromSquareAndPartition(new Cube(square).
                 GetCubeWithSymbolsAsRowsTranspose().toRectangle(square.SymbolCount(),
-                square.GetColumnsNumber()), last.WithNewOrder(2, 1, 0)), true));
+                square.GetColumnsNumber()), last.WithNewOrder(2, 1, 0))));
                 if (set.AsString() == last.AsString())
                     break;
                 partitionsN.Add(set);
@@ -72,9 +72,9 @@ namespace LatinSquares.Models
             } while (true);
 
             partitionsG.Add(new PartitionsSet(
-                GetPartitionsForRows(comparisonMatrices["rows"], true),
-                GetPartitionsForRows(comparisonMatrices["cols"], true),
-                GetPartitionsForRows(comparisonMatrices["symbols"], true)
+                GetPartitionsForRows(comparisonMatrices["rows"]),
+                GetPartitionsForRows(comparisonMatrices["cols"]),
+                GetPartitionsForRows(comparisonMatrices["symbols"])
                 ));
         }
 
@@ -118,7 +118,6 @@ namespace LatinSquares.Models
                         tripletValues[i, j] = "   -   ";
                     else
                     {
-                        //int val = square.values[i, j].AsInt();
                         int val = Array.IndexOf(Utils.SYMBOLS, square.values[i, j]);
                         tripletValues[i, j] = "(" +
                             partition.Rows.Groups.FirstOrDefault(x => x.Value.Contains(i)).Key + "," +
@@ -150,7 +149,7 @@ namespace LatinSquares.Models
             return colsTripletValues;
         }
 
-        private string GetPartitionsForRows(string [,] tripletValues, bool useSymbols = false)
+        private string GetPartitionsForRows(string [,] tripletValues)
         {
             var rows = new List<string[]>();
             for (int i = 0; i < tripletValues.GetLength(0); i++)
@@ -179,7 +178,7 @@ namespace LatinSquares.Models
                 rowsString += "{";
                 foreach (int n in p.Value)
                 {
-                    rowsString += (useSymbols ? Utils.SYMBOLS[n] : (n + 1) + "") + ",";
+                    rowsString += (n + 1) + ",";
                 }
                 rowsString = rowsString.Substring(0, rowsString.Length - 1) + "},";
             }
@@ -198,8 +197,8 @@ namespace LatinSquares.Models
                 square.GetColumnsNumber()), partition);
             PartitionsSet set = new PartitionsSet(
                 GetPartitionsForRows(triplets),
-                GetPartitionsForRows(colTriplets, true),
-                GetPartitionsForRows(symTriplets, true));
+                GetPartitionsForRows(colTriplets),
+                GetPartitionsForRows(symTriplets));
             return set;
         }
 
