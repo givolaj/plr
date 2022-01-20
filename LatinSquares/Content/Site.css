@@ -47,7 +47,7 @@ code {
     border: 0px solid #f0f0f0;
     padding-top: 10px;
     padding-bottom: 5px;
-    border-radius: 0px 0px 30% 30%;
+    border-radius: 0px 0px 20% 0px;
 }
 
 .form-group > label, .form-group > input, button {
@@ -170,8 +170,8 @@ input, select, textarea {
     font-size: 20px;
 }
 
-/*input[type=range]*/
 
+/*input[type=range]*/
 input[type=range] {
     overflow: visible;
     height: 30px;
@@ -273,11 +273,26 @@ input[type=range] {
         background: #aaaaaa;
     }
 
+
     /*mobile css*/
 
 @media (max-width: 479px) {
     footer p {
         margin-top: 5px;
         font-size: 13px;
+    }
+
+    .jumbotron img {
+        display: none;
+    }
+
+    .form-group .btn {
+        margin-top: 10px;
+    }
+
+    pre, code {
+        min-height: 200px;
+        min-width: 200px;
+        width: 100% !important;
     }
 }
