@@ -217,15 +217,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
-    <Content Include="Content\bg-old.jpg" />
-    <Content Include="Content\bg2.png" />
+    <Content Include="Content\bg.png" />
     <Content Include="Content\bipartite.gif" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\full.gif" />
     <Content Include="Content\ilovemath.jpg" />
     <Content Include="Content\nav-bg.jpg" />
-    <Content Include="Content\bg.jpg" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
