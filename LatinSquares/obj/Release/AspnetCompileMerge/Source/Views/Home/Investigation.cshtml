@@ -27,6 +27,8 @@
 
     #squareInput {
         margin-bottom: 10px;
+        font-family: monospace;
+        font-size: 20px;
     }
 
     #tripletsDiv {
@@ -48,15 +50,19 @@
     <p>investigate a PLR, see if it's guilty.</p>
 </div>
 <div class="row text-div">
-    <div class="col-xs-12 col-md-12 ">
+    <div class="col-xs-12">
         <h2>The rectangle</h2>
         <label>Click 'PLR' to generate a rectangle, 'Edit' to edit it, and 'Go' to start the investigation. Good luck!</label>
         <hr />
+    </div>
+    <div class="col-xs-12 col-md-6">
         <div id="initialSquareDiv"><pre>your PLR will appear here</pre></div>
-        <div><textarea rows="5" class="form-control hidden" id="squareInput"></textarea></div>
         <button class="btn btn-primary btn-lg pull-left" id="randomSquareBtn">PLR</button>
         <button class="btn btn-success btn-lg pull-left margin-left-10" id="editBtn">Edit</button>
         <button class="btn btn-info btn-lg pull-left margin-left-10" id="goBtn">Go</button>
+    </div>
+    <div class="col-xs-12 col-md-6">
+        <div><textarea rows="5" class="form-control hidden" id="squareInput"></textarea></div>
     </div>
 </div>
 <div class="row text-div">
@@ -118,6 +124,9 @@
             });
 
             $("#editBtn").click(function () {
+                let val = $("#initialSquareDiv").text();
+                $("#squareInput").val(val);
+                $("#squareInput").attr('rows', val.split("[").length);
                 $("#squareInput").toggleClass("hidden");
             });
 

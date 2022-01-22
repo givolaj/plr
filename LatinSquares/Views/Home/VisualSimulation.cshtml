@@ -35,6 +35,8 @@
 
     #squareInput {
         margin-bottom: 10px;
+        font-family: monospace;
+        font-size: 20px;
     }
 
     #tripletsDiv {
@@ -49,20 +51,25 @@
     <p>We draw the bipartite graph generated between two rows of a PLR, and it's subgraphs, as the first step of our new way of discovering if it's non trivial.</p>
 </div>
 <div class="row text-div">
-    <div class="col-md-12 col-xs-12">
+    <div class="col-xs-12">
         <h2>The rectangle</h2>
-        <label>Click 'PLR' to generate a rectangle, 'Edit' to edit it, and 'Go' to start the investigation.</label>
+        <label>Click 'PLR' to generate a rectangle, 'Edit' to edit it, and 'Go' to start the investigation. Good luck!</label>
         <hr />
+    </div>
+    <div class="col-xs-12 col-md-6">
         <div id="initialSquareDiv"><pre>your PLR will appear here</pre></div>
-        <div><textarea rows="5" class="form-control hidden" id="squareInput"></textarea></div>
         <button class="btn btn-primary btn-lg pull-left" id="randomSquareBtn">PLR</button>
         <button class="btn btn-success btn-lg pull-left margin-left-10" id="editBtn">Edit</button>
         <button class="btn btn-info btn-lg pull-left margin-left-10" id="goBtn">Go</button>
     </div>
+    <div class="col-xs-12 col-md-6">
+        <div><textarea rows="5" class="form-control hidden" id="squareInput"></textarea></div>
+    </div>
 
+    <div class="col-xs-12" style="height: 10px;"></div>
     <div class="col-md-6 col-xs-12 hidden margin-top-10" id="simulationRow">
         <h2>Graph</h2>
-        <label>We're drawing a graph between two rows, drawing a solid line vertically and a dotted line diagonally where the numbers are equal.</label>
+        <label>We're drawing a graph between two rows, a solid line vertically and a dotted line diagonally on identical symbols.</label>
         <hr />
         <div style="overflow: scroll;">
             <canvas id="simulationCanvas" width="450" height="300" style="background-color: #f0f0f0; border:1px solid #a0a0a0;"></canvas>
@@ -130,6 +137,9 @@
             });
 
             $("#editBtn").click(function () {
+                let val = $("#initialSquareDiv").text().replaceAll("]", "]\n");
+                $("#squareInput").val(val);
+                $("#squareInput").attr('rows', val.split("[").length);
                 $("#squareInput").toggleClass("hidden");
             });
 
