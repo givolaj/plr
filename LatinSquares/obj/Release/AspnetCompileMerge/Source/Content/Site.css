@@ -50,7 +50,7 @@ code {
     border-radius: 0px 0px 20% 0px;
 }
 
-.form-group > label, .form-group > input, button {
+.form-group > label, .form-group > input, button, .form-group select {
     font-size: 18px !important;
 }
 

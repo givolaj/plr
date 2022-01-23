@@ -205,8 +205,6 @@
                     type: "get",
                     success: function (data) {
                         $("#workingLabel").html('done!');
-                        //$("#closeModal").click();
-                        console.log(data);
                         download(data, "rectangles", "txt");
                     },
                     error: function (err) {
