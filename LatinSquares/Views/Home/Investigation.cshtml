@@ -65,7 +65,7 @@
         <div><textarea rows="5" class="form-control hidden" id="squareInput"></textarea></div>
     </div>
 </div>
-<div class="row text-div">
+<div class="row text-div hidden" id="detailsDiv">
     <div class="col-md-12 col-xs-12">
         <br />
         <br />
@@ -149,7 +149,7 @@
             }
 
             $("#goBtn").click(function () {
-                $("#tripletsRow").removeClass("hidden");
+                $("#tripletsRow, #detailsDiv").removeClass("hidden");
                 let squareString = $("#initialSquareDiv").text();
                 $("#ERRow").removeClass("hidden");
                 $("#comparisonMatrix").removeClass("hidden");
