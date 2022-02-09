@@ -51,6 +51,9 @@
                         </ul>
                     </li>
                     <li>@Html.ActionLink("Our Database", "DB", "Home", new { area = "" }, null)</li>
+                    <li class="dropdown" style="overflow: visible;">
+                        <a class="dropdown-toggle" data-toggle="dropdown" id="FAQ">FAQ<span class="caret"></span></a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -92,6 +95,26 @@
                     }
                 });
             }, 300);
+
+            var FAQContent = $("<div/>").html('<div class="accordion" id="accordionExample">' +
+                '          <div class="accordion-item">' +
+                '            <h2 class="accordion-header" id="headingOne">' +
+                '              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">' +
+                '              <div class="circle-icon"> <i class="fa fa-question"></i> </div>' +
+                '              <span>How to Create FAQ Section</span> </button>' +
+                '            </h2>' +
+                '            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">' +
+                '              <div class="accordion-body"> <strong>This is the first item\'s accordion body.</strong> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </div>' +
+                '            </div>' +
+                '          </div>' +
+                '</div>');
+
+            tippy('#FAQ', {
+                theme: 'light',
+                interactive: true,
+                content: FAQContent.html(),
+                trigger: 'click',
+            });
         });
     </script>
 
