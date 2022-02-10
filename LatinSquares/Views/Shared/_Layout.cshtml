@@ -68,6 +68,32 @@
             <img src="~/Content/ilovemath.jpg" style="height: 50px; width: auto; display: inline; float: right;" />
         </footer>
     </div>
+    <div id="loading" class="hidden">
+        <img src="~/Content/loading.gif" />
+    </div>
+    <style>
+        #loading {
+            z-index: 1000000;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: rgba(245, 245, 220, 0.01);
+        }
+
+            #loading img {
+                width: 200px;
+                height: 200px;
+                position: absolute;
+                display: block;
+                top: calc(50% - 100px);
+                left: calc(50% - 100px);
+                border-radius: 100px;
+                border: 1px solid rgba(0,0,0,0.2);
+                box-shadow: 0px 8px 8px rgba(0,0,0,0.2);
+            }
+    </style>
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
@@ -79,6 +105,7 @@
 
             $(document).on('change', 'input', function () {
                 let id = $(this).attr('id');
+                console.log('change', id);
                 if (id) {
                     localStorage[id] = $(this).val();
                 }
@@ -96,27 +123,111 @@
                 });
             }, 300);
 
-            var FAQContent = $("<div/>").html('<div class="accordion" id="accordionExample">' +
-                '          <div class="accordion-item">' +
-                '            <h2 class="accordion-header" id="headingOne">' +
-                '              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">' +
-                '              <div class="circle-icon"> <i class="fa fa-question"></i> </div>' +
-                '              <span>How to Create FAQ Section</span> </button>' +
-                '            </h2>' +
-                '            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">' +
-                '              <div class="accordion-body"> <strong>This is the first item\'s accordion body.</strong> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </div>' +
-                '            </div>' +
-                '          </div>' +
-                '</div>');
+            var FAQContent = '<div id="accordion">' +
+                '  <div class="card">' +
+                '    <div class="card-header" id="headingOne">' +
+                '      <h5 class="mb-0">' +
+                '        <button class="btn btn-FAQ" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">' +
+                '          So how do i use this website?' +
+                '        </button>' +
+                '      </h5>' +
+                '    </div>' +
+                '    <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">' +
+                '      <div class="card-body">' +
+                '<div>Generate single PLRs or PLR batch files, starting with an <a href="/home/empty" class="FAQLink">empty</a> or a <a href="/home/full" class="FAQLink">full</a> rectangles.</div>' + 
+                '<div>After getting a PLR, you can investigate with by clicking \'investigate\' below the generated PLR, or going to the <a href="/home/investigation" class="FAQLink">investigation</a> page and pasting a PLR in the \'edit\' box.</div>' + 
+                '      </div>' +
+                '    </div>' +
+                '  </div>' +
+                '  <div class="card">' +
+                '    <div class="card-header" id="headingTwo">' +
+                '      <h5 class="mb-0">' +
+                '        <button class="btn btn-FAQ collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">' +
+                '          What are the parameters i need to fill in when generating a rectangle and what are the limitations?' +
+                '        </button>' +
+                '      </h5>' +
+                '    </div>' +
+                '    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">' +
+                '      <div class="card-body">' +
+                ' These are the variables for most calls, and their respected limitations: <br/><br/>' + 
+                '       <b>rows</b> - the number of rows in the matrix - integer, where rows > 2 and rows < 36. parameters can actually go above 36 but run time of such calls will increase substantially.<br/><br/>' +
+                '       <b>columns</b> - the number of columns in the matrix - integer, where columns > 2 and columns < 36.<br/><br/>' +
+                '       <b>symbols</b> - the number of different symbols in the language we\'re deriving our PLR from - integer, where symbols >= MAX(rows, columns).<br/><br/>' +
+                '       <b>number of non empty entries</b> - the number of non empty entries in the matrix - integer. recommanded to use number of non empty entries >= sumbols. in \'empty\' PLRs number of non empty entries >= symbols is mandatory, and the server will correct you if you set the parameter incorrectly.<br/><br/>' +
+                '       note: number of non empty entries can also be determined as a percentage, below the number of non empty entries input box.' +
+                '      </div>' +
+                '    </div>' +
+                '  </div>' +
+                '</div>';
 
             tippy('#FAQ', {
-                theme: 'light',
+                placement: 'bottom',
+                maxWidth: 'none',
+                allowHTML: true,
                 interactive: true,
-                content: FAQContent.html(),
+                content: FAQContent,
                 trigger: 'click',
             });
         });
+
+        function loading(show) {
+            show ? $("#loading").removeClass("hidden") : $("#loading").addClass("hidden");
+        }
+
+        (function () {
+            var _oldAjax = $.ajax;
+            $.ajax = function (options) {
+                $.extend(options, {
+                    beforeSend: function () {
+                        loading(true);
+                    },
+                    complete: function () {
+                        setTimeout(function () { loading(false); }, 500);
+                    }
+                });
+                return _oldAjax(options);
+            };
+        })();
     </script>
+
+    <style>
+
+        .tippy-box {
+            min-width: 350px;
+            font-size: 17px;
+            background-color: #525252;
+            border: 1px solid rgba(222, 80, 80, 0.3);
+            border-radius: 5px;
+            color: #fff;
+            overflow: scroll;
+            padding: 5px 5px 5px 10px;
+        }
+
+            .tippy-box[data-placement^=bottom] > .tippy-arrow:before {
+                border-bottom-color: transparent !important;
+            }
+
+        .btn-FAQ {
+            font-size: 22px !important;
+            text-align: left;
+            border-radius: 0px;
+            width: 100%;
+            color: #fff !important;
+            background-color: transparent !important;
+            border-top: none !important;
+            border-right: none !important;
+            border-left: none !important;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(222, 222, 222, 0.3) !important;
+        }
+
+        .FAQLink, .FAQLink:active, .FAQLink:visited, .FAQLink:hover {
+            color: #fff !important;
+            font-weight: 700;
+            text-decoration: none;
+            font-size: inherit !important;
+        }
+    </style>
 
     @RenderSection("scripts", required: false)
 

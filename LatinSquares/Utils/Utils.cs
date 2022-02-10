@@ -144,6 +144,7 @@ namespace LatinSquares
 
         public static Rectangle GetRectangle(int rows, int cols, int symbols, int howManyFullSlots)
         {
+            if (howManyFullSlots == 0) howManyFullSlots = Math.Max(Math.Max(rows, cols), symbols);
             Rectangle sq = GetRandomUnitRectangle(rows, cols, symbols);
             Random r = GetGlobalRandomGenerator();
             FillRectangle(sq, r, symbols, howManyFullSlots - Math.Max(rows, cols));
