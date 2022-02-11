@@ -51,6 +51,9 @@
                         </ul>
                     </li>
                     <li>@Html.ActionLink("Our Database", "DB", "Home", new { area = "" }, null)</li>
+                    <li class="dropdown" style="overflow: visible;">
+                        <a class="dropdown-toggle" data-toggle="dropdown" id="FAQ">FAQ<span class="caret"></span></a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -65,6 +68,32 @@
             <img src="~/Content/ilovemath.jpg" style="height: 50px; width: auto; display: inline; float: right;" />
         </footer>
     </div>
+    <div id="loading" class="hidden">
+        <img src="~/Content/loading.gif" />
+    </div>
+    <style>
+        #loading {
+            z-index: 1000000;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: rgba(245, 245, 220, 0.01);
+        }
+
+            #loading img {
+                width: 200px;
+                height: 200px;
+                position: absolute;
+                display: block;
+                top: calc(50% - 100px);
+                left: calc(50% - 100px);
+                border-radius: 100px;
+                border: 1px solid rgba(0,0,0,0.2);
+                box-shadow: 0px 8px 8px rgba(0,0,0,0.2);
+            }
+    </style>
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
@@ -76,6 +105,7 @@
 
             $(document).on('change', 'input', function () {
                 let id = $(this).attr('id');
+                console.log('change', id);
                 if (id) {
                     localStorage[id] = $(this).val();
                 }
@@ -92,8 +122,142 @@
                     }
                 });
             }, 300);
+
+            var FAQContent = '<div id="accordion">' +
+                '  <div class="card">' +
+                '    <div class="card-header" id="headingZero">' +
+                '      <h5 class="mb-0">' +
+                '        <button class="btn btn-FAQ" data-toggle="collapse" data-target="#collapseZero" aria-expanded="true" aria-controls="collapseZero">' +
+                '          What is a PLR?' +
+                '        </button>' +
+                '      </h5>' +
+                '    </div>' +
+                '    <div id="collapseZero" class="collapse" aria-labelledby="headingZero" data-parent="#accordion">' +
+                '      <div class="card-body">' +
+                '<div>PLR is short for partial Latin rectangle, which is a matrix in which no row or column contains the same symbol twice (a soduko is a nice familiar example of a PLR).<br/>' +
+                'you can read more about in our <a href="/" class="FAQLink">home page</a>.</div>' +
+                '      </div>' +
+                '    </div>' +
+                '  </div>' +
+                '  <div class="card">' +
+                '    <div class="card-header" id="headingOne">' +
+                '      <h5 class="mb-0">' +
+                '        <button class="btn btn-FAQ" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">' +
+                '          So how do i use this website?' +
+                '        </button>' +
+                '      </h5>' +
+                '    </div>' +
+                '    <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">' +
+                '      <div class="card-body">' +
+                '<div>Generate single PLRs or PLR batch files, starting with an <a href="/home/empty" class="FAQLink">empty</a> or a <a href="/home/full" class="FAQLink">full</a> rectangles.</div>' + 
+                '<div>After getting a PLR, you can investigate with by clicking \'investigate\' below the generated PLR, or going to the <a href="/home/investigation" class="FAQLink">investigation</a> page and pasting a PLR in the \'edit\' box.</div>' + 
+                '      </div>' +
+                '    </div>' +
+                '  </div>' +
+                '  <div class="card">' +
+                '    <div class="card-header" id="headingTwo">' +
+                '      <h5 class="mb-0">' +
+                '        <button class="btn btn-FAQ collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">' +
+                '          What are the parameters i need to fill in when generating a rectangle and what are the limitations?' +
+                '        </button>' +
+                '      </h5>' +
+                '    </div>' +
+                '    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">' +
+                '      <div class="card-body">' +
+                ' These are the variables for most calls, and their respected limitations: <br/><br/>' + 
+                '       <b>rows</b> - the number of rows in the matrix - integer, where rows > 2 and rows < 36. parameters can actually go above 36 but run time of such calls will increase substantially.<br/><br/>' +
+                '       <b>columns</b> - the number of columns in the matrix - integer, where columns > 2 and columns < 36.<br/><br/>' +
+                '       <b>symbols</b> - the number of different symbols in the language we\'re deriving our PLR from - integer, where symbols >= MAX(rows, columns).<br/><br/>' +
+                '       <b>number of non empty entries</b> - the number of non empty entries in the matrix - integer. recommanded to use number of non empty entries >= sumbols. in \'empty\' PLRs number of non empty entries >= symbols is mandatory, and the server will correct you if you set the parameter incorrectly.<br/><br/>' +
+                '       note: number of non empty entries can also be determined as a percentage, below the number of non empty entries input box.' +
+                '      </div>' +
+                '    </div>' +
+                '  </div>' +
+                '  <div class="card">' +
+                '    <div class="card-header" id="headingThree">' +
+                '      <h5 class="mb-0">' +
+                '        <button class="btn btn-FAQ collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="headingThree">' +
+                '          What are the letters that appear in the PLRs?' +
+                '        </button>' +
+                '      </h5>' +
+                '    </div>' +
+                '    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">' +
+                '      <div class="card-body">' +
+                '       Since a language can have more than 10 symbols, we write \'a\', \'b\', \'c\', instead of \'10\', \'11\', \'12\', just for readability.' +
+                '      </div>' +
+                '    </div>' +
+                '  </div>' +
+                '</div>';
+
+            tippy('#FAQ', {
+                placement: 'bottom',
+                maxWidth: 'none',
+                allowHTML: true,
+                interactive: true,
+                content: FAQContent,
+                trigger: 'click',
+            });
         });
+
+        function loading(show) {
+            show ? $("#loading").removeClass("hidden") : $("#loading").addClass("hidden");
+        }
+
+        (function () {
+            var _oldAjax = $.ajax;
+            $.ajax = function (options) {
+                $.extend(options, {
+                    beforeSend: function () {
+                        loading(true);
+                    },
+                    complete: function () {
+                        setTimeout(function () { loading(false); }, 500);
+                    }
+                });
+                return _oldAjax(options);
+            };
+        })();
     </script>
+
+    <style>
+
+        .tippy-box {
+            min-width: 350px;
+            font-size: 18px;
+            background-image: linear-gradient(90deg, rgba(67,67,67,1) 0%, rgba(50,50,50,1) 35%, rgba(82,82,82,1) 100%);
+            border: 1px solid rgba(222, 80, 80, 0.3);
+            border-radius: 5px;
+            color: #fff;
+            overflow: scroll;
+            padding: 5px 5px 5px 10px;
+        }
+
+            .tippy-box[data-placement^=bottom] > .tippy-arrow:before {
+                border-bottom-color: transparent !important;
+            }
+
+        .btn-FAQ {
+            font-size: 22px !important;
+            text-align: left;
+            border-radius: 0px;
+            width: 100%;
+            color: #fff !important;
+            background-color: transparent !important;
+            border-top: none !important;
+            border-right: none !important;
+            border-left: none !important;
+            font-weight: 500;
+            border-bottom: 2px solid rgba(222, 222, 222, 0.6) !important;
+            text-shadow: 1px 1px 1px #c55;
+        }
+
+        .FAQLink, .FAQLink:active, .FAQLink:visited, .FAQLink:hover {
+            color: #fff !important;
+            font-weight: 500;
+            text-decoration: underline;
+            font-size: inherit !important;
+        }
+    </style>
 
     @RenderSection("scripts", required: false)
 

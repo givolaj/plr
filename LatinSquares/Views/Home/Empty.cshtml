@@ -26,7 +26,7 @@
         <h2>Parameters</h2>
         <label>
             Fill out parametes and click 'Generate'.<br />Parameters bounds and restrictions: <br /> rows, cols > 2 <br /> rows, cols < 36<br />
-            symbols >= max(rows, cols) <br /> Other values may behave unpredictably.
+            symbols & Number of non empty entries >= max(rows, cols) <br /> Other values may behave unpredictably.
         </label>
         <hr />
 
@@ -138,6 +138,7 @@
                     },
                     error: function (err) {
                         console.log(err);
+                        $("#output").html("<pre><code style='color: #c55;'>Oops! you broke the system\ntry different parameters</code></pre>");
                     }
                 });
             });

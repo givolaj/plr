@@ -27,7 +27,10 @@
 <div class="row text-div">
     <div class="col-md-6 col-xs-12">
         <h2>Parameters</h2>
-        <label>Fill out parametes and click 'Generate'.<br /> Minimum value for all fields is 2, Maximum is 36. Other values may behave unpredictably. <br />Number of symbols can't be smaller than rows and columns.</label>
+        <label>
+            Fill out parametes and click 'Generate'.<br />Parameters bounds and restrictions: <br /> rows, cols > 2 <br /> rows, cols < 36<br />
+            symbols >= max(rows, cols) <br /> Other values may behave unpredictably.
+        </label>
         <hr />
 
         <div class="form-group">
@@ -139,6 +142,7 @@
                     },
                     error: function (err) {
                         console.log(err);
+                        $("#output").html("<pre><code style='color: #c55;'>Oops! you broke the system\ntry different parameters</code></pre>");
                     }
                 });
             });
@@ -236,6 +240,7 @@
                 let val = Number($(this).val());
                 let count = size * (val / 100);
                 $("#count").val(parseInt(count));
+                localStorage["count"] = count; 
             });
 
             $("#count").change(function () {
