@@ -152,8 +152,18 @@ namespace LatinSquares
             return sq;
         }
 
-        public static bool FillRectangle(Rectangle sq, Random r, int symbols, int howManyFullSlots)
+        private static readonly int FillRectangleIterationsMax = 20000;
+        private static int FillRectangleIterations = 0;
+        public static bool FillRectangle(Rectangle sq, Random r, int symbols, int howManyFullSlots) 
         {
+            FillRectangleIterations = FillRectangleIterationsMax;
+            return _FillRectangle(sq, r, symbols, howManyFullSlots);
+        }
+        public static bool _FillRectangle(Rectangle sq, Random r, int symbols, int howManyFullSlots)
+        {
+            if (FillRectangleIterations <= 0) throw new Exception("didn't make it!");
+            FillRectangleIterations--;
+
             if (howManyFullSlots == 0) return true;
 
             int symbolIndex = r.Next(symbols);
@@ -173,7 +183,7 @@ namespace LatinSquares
                 else
                 {
                     sq.Set(SYMBOLS[(symbolIndex + _symbols) % symbols], row, col);
-                    bool success = FillRectangle(sq, r, symbols, howManyFullSlots - 1);
+                    bool success = _FillRectangle(sq, r, symbols, howManyFullSlots - 1);
                     if (success)
                         return true;
                     else

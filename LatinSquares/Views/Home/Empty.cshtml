@@ -135,10 +135,12 @@
                     success: function (data) {
                         recData = data;
                         $("#output").html(data + sendButton);
+                        successSound();
                     },
                     error: function (err) {
                         console.log(err);
                         $("#output").html("<pre><code style='color: #c55;'>Oops! you broke the system\ntry different parameters</code></pre>");
+                        errorSound();
                     }
                 });
             });
