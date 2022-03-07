@@ -156,8 +156,8 @@
                 '    </div>' +
                 '    <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">' +
                 '      <div class="card-body">' +
-                '<div>Generate single PLRs or PLR batch files, starting with an <a href="/home/empty" class="FAQLink">empty</a> or a <a href="/home/full" class="FAQLink">full</a> rectangles.</div>' + 
-                '<div>After getting a PLR, you can investigate with by clicking \'investigate\' below the generated PLR, or going to the <a href="/home/investigation" class="FAQLink">investigation</a> page and pasting a PLR in the \'edit\' box.</div>' + 
+                '<div>Generate single PLRs or PLR batch files, starting with an <a href="/home/empty" class="FAQLink">empty</a> or a <a href="/home/full" class="FAQLink">full</a> rectangles.</div>' +
+                '<div>After getting a PLR, you can investigate with by clicking \'investigate\' below the generated PLR, or going to the <a href="/home/investigation" class="FAQLink">investigation</a> page and pasting a PLR in the \'edit\' box.</div>' +
                 '      </div>' +
                 '    </div>' +
                 '  </div>' +
@@ -171,7 +171,7 @@
                 '    </div>' +
                 '    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">' +
                 '      <div class="card-body">' +
-                ' These are the variables for most calls, and their respected limitations: <br/><br/>' + 
+                ' These are the variables for most calls, and their respected limitations: <br/><br/>' +
                 '       <b>rows</b> - the number of rows in the matrix - integer, where rows > 2 and rows < 36. parameters can actually go above 36 but run time of such calls will increase substantially.<br/><br/>' +
                 '       <b>columns</b> - the number of columns in the matrix - integer, where columns > 2 and columns < 36.<br/><br/>' +
                 '       <b>symbols</b> - the number of different symbols in the language we\'re deriving our PLR from - integer, where symbols >= MAX(rows, columns).<br/><br/>' +
@@ -236,7 +236,15 @@
             setTimeout(function () { $("#errorSound")[0].play(); }, 300);
         }
     </script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DRK2XXMVR4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
+        gtag('config', 'G-DRK2XXMVR4');
+    </script>
     <style>
 
         .tippy-box {
